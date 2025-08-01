@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tienoi.one - Cổng Thông Tin Vũ Trụ</title>
+    <meta name="description" content="Tienoi.one - Cổng thông tin vũ trụ. Tìm kiếm, so sánh và khám phá hàng ngàn sản phẩm, dịch vụ một cách nhanh chóng và chính xác. Dữ liệu cập nhật liên tục.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/genai": "https://esm.sh/@google/genai@^0.14.0"
+        }
+      }
+    </script>
+    <script type="module" src="index.tsx"></script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <header id="home">
+        <canvas id="particle-canvas"></canvas>
+        <nav>
+            <div class="nav-container">
+                <a href="#home" class="nav-logo">Tienoi.one</a>
+                <div class="nav-menu" id="nav-menu">
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About us</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#search-section">Search</a></li>
+                    </ul>
+                </div>
+                <div class="nav-actions">
+                    <button class="nav-toggle" id="nav-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="nav-menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+          </nav>
+      <div class="header-content">
+        <h1>Tienoi.one</h1>
+        <p>Cổng thông tin vũ trụ, nơi mọi tìm kiếm của bạn đều được giải đáp.</p>
+      </div>
+    </header>
+
+    <main>
+        <div id="loading-spinner" style="display: none;"></div>
+
+        <section id="search-section">
+            <div class="search-section-wrapper">
+                <h2>Bắt Đầu Khám Phá</h2>
+                <form id="search-form" class="search-container">
+                    <input type="search" id="search-input" placeholder="Tìm kiếm sản phẩm, dịch vụ..." aria-label="Tìm kiếm sản phẩm, dịch vụ">
+                    <button type="submit" id="search-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                        <span>Tìm kiếm</span>
+                    </button>
+                </form>
+                <div class="search-addons-container">
+                    <section id="suggestions-section">
+                        <h3>Gợi ý cho bạn</h3>
+                        <div id="suggestions-container" class="smart-suggestions-container">
+                            <!-- Smart suggestions will be injected by JavaScript -->
+                        </div>
+                    </section>
+            
+                    <section id="recent-searches-section" class="recent-searches" style="display: none;">
+                        <h3>Tìm kiếm gần đây</h3>
+                        <div id="recent-searches-container"></div>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <section id="results" class="product-grid" aria-live="polite">
+            <!-- Products will be loaded here by JavaScript -->
+        </section>
+      
+        <section id="recently-viewed-section" class="recently-viewed" style="display: none;">
+            <h2>Sản phẩm vừa xem</h2>
+            <div id="recently-viewed-container"></div>
+        </section>
+
+        <section id="about" class="content-section">
+            <h2>Giới Thiệu Về Tienoi.one</h2>
+            <div class="about-content">
+                <h3>Sứ Mệnh Của Chúng Tôi</h3>
+                <p>Trong một thế giới số phức tạp, sứ mệnh của Tienoi.one là trao quyền cho bạn. Chúng tôi đơn giản hóa việc tìm kiếm thông tin về sản phẩm và dịch vụ, giúp bạn đưa ra quyết định sáng suốt một cách nhanh chóng, tự tin và không tốn sức.</p>
+                
+                <h3>Giá Trị Cốt Lõi</h3>
+                <div class="values-grid">
+                    <div class="value-card">
+                        <h4>Minh Bạch & Tin Cậy</h4>
+                        <p>Thông tin được tổng hợp từ các nguồn dữ liệu công khai, đảm bảo tính khách quan và chính xác. Những gì bạn thấy là những gì bạn có thể tin tưởng.</p>
+                    </div>
+                    <div class="value-card">
+                        <h4>Nhanh Chóng & Tiện Lợi</h4>
+                        <p>Tiết kiệm thời gian quý báu của bạn. Công cụ tìm kiếm mạnh mẽ của chúng tôi loại bỏ nhu cầu duyệt qua vô số trang web. Mọi thứ bạn cần, tất cả ở một nơi.</p>
+                    </div>
+                    <div class="value-card">
+                        <h4>Lấy Người Dùng Làm Trung Tâm</h4>
+                        <p>Trải nghiệm của bạn là ưu tiên hàng đầu. Chúng tôi không ngừng lắng nghe và cải tiến nền tảng để phục vụ bạn tốt hơn mỗi ngày.</p>
+                    </div>
+                </div>
+        
+                <h3>Cách Chúng Tôi Hoạt Động</h3>
+                <p>Tienoi.one sử dụng công nghệ tiên tiến để kết nối trực tiếp và đồng bộ hóa dữ liệu từ nhiều nguồn khác nhau theo thời gian thực. Bằng cách tự động hóa quy trình thu thập và trình bày thông tin, chúng tôi đảm bảo bạn luôn có được dữ liệu mới nhất mà không cần chờ đợi.</p>
+            </div>
+        </section>
+
+        <section id="blog" class="content-section">
+            <h2>Blog</h2>
+            <div id="blog-grid" class="article-grid">
+                <!-- Blog posts will be loaded here by JavaScript -->
+                <div id="loading-spinner-blog" class="loading-spinner"></div>
+            </div>
+        </section>
+
+        <section id="testimonials" class="content-section">
+            <h2>Nhận xét của khách hàng về chúng tôi</h2>
+            <div class="testimonial-grid">
+              <div class="testimonial-card">
+                <blockquote>"Trang web này đã thay đổi cách tôi tìm kiếm thông tin sản phẩm. Rất nhanh và chính xác. Tôi đã tiết kiệm được rất nhiều thời gian!"</blockquote>
+                <cite>– Anh Nguyễn Văn A</cite>
+              </div>
+              <div class="testimonial-card">
+                <blockquote>"Giao diện thân thiện, dễ sử dụng. Chức năng tìm kiếm gần đây thực sự hữu ích. 5 sao!"</blockquote>
+                <cite>– Chị Trần Thị B</cite>
+              </div>
+              <div class="testimonial-card">
+                <blockquote>"Dữ liệu được cập nhật trực tiếp từ Google Sheet là một ý tưởng tuyệt vời. Rất linh hoạt cho người quản trị như tôi."</blockquote>
+                <cite>– Anh Lê Văn C</cite>
+              </div>
+            </div>
+          </section>
+
+        <section id="contact" class="content-section">
+            <h2>Liên Hệ Với Chúng Tôi</h2>
+            <p>Chúng tôi rất mong nhận được phản hồi từ bạn. Vui lòng điền vào biểu mẫu dưới đây và chúng tôi sẽ liên hệ lại sớm nhất có thể.</p>
+            <form id="contact-form" class="contact-form">
+                <div class="form-group">
+                    <label for="name">Họ và tên:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Lời nhắn:</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="cta-button">Gửi tin nhắn</button>
+                <div id="form-status"></div>
+            </form>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column" id="footer-about">
+                <h4><a href="#home" class="nav-logo">Tienoi.one</a></h4>
+                <p>Cổng thông tin vũ trụ, đơn giản hóa việc tìm kiếm sản phẩm và dịch vụ, giúp bạn đưa ra quyết định sáng suốt.</p>
+            </div>
+            <div class="footer-column" id="footer-tags">
+                <h4>Thẻ phổ biến</h4>
+                <div id="footer-tags-container" class="footer-tags-container">
+                    <!-- Tags will be injected by JS -->
+                </div>
+            </div>
+            <div class="footer-column" id="footer-blog">
+                <h4>Bài viết mới nhất</h4>
+                <ul id="footer-blog-container">
+                    <!-- Recent blog posts will be injected by JS -->
+                </ul>
+            </div>
+            <div class="footer-column" id="footer-links">
+                <h4>Điều hướng</h4>
+                <ul id="footer-menu-container">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About us</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Tienoi.one. All rights reserved.</p>
+            <div class="footer-legal-links">
+                <a href="#/privacy-policy">Chính sách Bảo mật</a>
+                <a href="#/terms-of-service">Điều khoản Dịch vụ</a>
+            </div>
+        </div>
+    </footer>
+
+    <section id="privacy-policy-page" class="policy-page" style="display: none;">
+        <h1>Chính sách Bảo mật</h1>
+        <h2>1. Cam kết của chúng tôi về quyền riêng tư</h2>
+        <p>Chào mừng bạn đến với Tienoi.one. Chúng tôi hiểu rằng quyền riêng tư của bạn là vô cùng quan trọng. Chính sách này giải thích rõ ràng những loại thông tin nào được thu thập và cách chúng tôi sử dụng nó, với sự minh bạch là ưu tiên hàng đầu.</p>
+    
+        <h2>2. Chúng tôi thu thập những thông tin gì?</h2>
+        <p>Chúng tôi phân loại rõ ràng các loại dữ liệu để bạn hiểu rõ cách chúng hoạt động:</p>
+        <ul>
+            <li><strong>Dữ liệu được lưu trữ cục bộ trên thiết bị của bạn:</strong> Để nâng cao trải nghiệm của bạn, một số thông tin được lưu trữ trực tiếp trong trình duyệt của bạn bằng công nghệ Local Storage. Dữ liệu này <strong>hoàn toàn không được gửi đến máy chủ của chúng tôi</strong> và chỉ có bạn mới có thể truy cập. Nó bao gồm:
+                <ul>
+                    <li><strong>Tìm kiếm gần đây:</strong> Giúp bạn nhanh chóng tìm lại các từ khóa đã sử dụng.</li>
+                    <li><strong>Sản phẩm đã xem:</strong> Giúp bạn dễ dàng truy cập lại các sản phẩm đã quan tâm.</li>
+                    <li><strong>Số lượt xem sản phẩm:</strong> Dùng để xếp hạng các sản phẩm "nổi bật" và tính toán "độ hot", giúp bạn khám phá các xu hướng.</li>
+                </ul>
+            </li>
+            <li><strong>Thông tin bạn cung cấp trực tiếp:</strong> Khi bạn sử dụng biểu mẫu liên hệ, chúng tôi sẽ thu thập tên, email và nội dung tin nhắn của bạn để có thể phản hồi.</li>
+            <li><strong>Thông tin ẩn danh gửi đến Trí tuệ nhân tạo (AI):</strong> Khi bạn sử dụng tính năng "Tư vấn chuyên gia", chúng tôi chỉ gửi thông tin công khai về sản phẩm (như tên, mô tả, giá) đến mô hình Google Gemini để tạo ra phân tích. Quá trình này <strong>không bao gồm bất kỳ thông tin cá nhân nào của bạn.</strong></li>
+        </ul>
+    
+        <h2>3. Cách chúng tôi sử dụng thông tin</h2>
+        <p>Mục đích chính của việc thu thập thông tin là để:</p>
+        <ul>
+            <li>Vận hành và duy trì website.</li>
+            <li>Cá nhân hóa và cải thiện trải nghiệm của bạn (ví dụ: hiển thị các sản phẩm bạn đã xem).</li>
+            <li>Phản hồi các yêu cầu hỗ trợ và liên hệ của bạn.</li>
+            <li>Phân tích và hiểu cách người dùng tương tác với website để chúng tôi có thể cải tiến tốt hơn (thông qua dữ liệu tổng hợp, ẩn danh).</li>
+        </ul>
+    
+        <h2>4. Chia sẻ thông tin</h2>
+        <p><strong>Chúng tôi không bán, trao đổi, hoặc cho thuê thông tin nhận dạng cá nhân của bạn cho bất kỳ bên thứ ba nào.</strong></p>
+        <p>Thông tin sản phẩm công khai có thể được chia sẻ với các dịch vụ của Google (Gemini API) cho mục đích tư vấn như đã nêu ở trên, nhưng luôn đảm bảo không dính kèm dữ liệu người dùng.</p>
+    
+        <h2>5. Liên kết của bên thứ ba</h2>
+        <p>Website có chứa các liên kết đến trang của nhà cung cấp sản phẩm/dịch vụ. Khi bạn nhấp vào các liên kết này, bạn sẽ được chuyển đến trang web của họ. Chúng tôi không chịu trách nhiệm về nội dung hay chính sách bảo mật của các trang này.</p>
+    
+        <h2>6. Thay đổi chính sách</h2>
+        <p>Chúng tôi có thể cập nhật chính sách này theo thời gian. Mọi thay đổi sẽ được đăng trên trang này và có hiệu lực ngay lập tức. Chúng tôi khuyến khích bạn thường xuyên xem lại để cập nhật thông tin.</p>
+    </section>
+    
+    <section id="terms-of-service-page" class="policy-page" style="display: none;">
+        <h1>Điều khoản Dịch vụ</h1>
+        <h2>1. Chấp nhận các điều khoản</h2>
+        <p>Bằng cách truy cập và sử dụng website Tienoi.one ("website"), bạn đồng ý tuân thủ các Điều khoản Dịch vụ này. Nếu bạn không đồng ý, vui lòng không sử dụng website.</p>
+    
+        <h2>2. Vai trò và mục đích của website</h2>
+        <p>Tienoi.one hoạt động như một nền tảng tổng hợp thông tin, giúp người dùng tìm kiếm và khám phá sản phẩm, dịch vụ. Chúng tôi không phải là người bán hàng hay nhà cung cấp trực tiếp. Mục đích của chúng tôi là cung cấp một công cụ tìm kiếm tiện lợi và các thông tin tham khảo.</p>
+    
+        <h2>3. Tuyên bố từ chối trách nhiệm</h2>
+        <p>Các tài liệu và thông tin trên website được cung cấp trên cơ sở "nguyên trạng".</p>
+        <ul>
+            <li><strong>Về tính chính xác của dữ liệu:</strong> Dữ liệu sản phẩm được lấy từ các nguồn công khai (cụ thể là Google Sheet do quản trị viên cung cấp). Chúng tôi không đưa ra bất kỳ bảo đảm nào về tính chính xác, đầy đủ, hoặc cập nhật của các thông tin này (ví dụ: giá cả, tình trạng còn hàng). Bạn nên xác minh lại thông tin tại trang của nhà cung cấp trước khi đưa ra quyết định mua hàng.</li>
+            <li><strong>Về nội dung do AI tạo ra:</strong> Các phân tích từ tính năng "Tư vấn chuyên gia" được tạo ra bởi mô hình ngôn ngữ lớn (Google Gemini). Nội dung này chỉ mang tính chất tham khảo, có thể chứa lỗi hoặc thông tin không chính xác. Chúng tôi không chịu trách nhiệm về bất kỳ quyết định nào của bạn dựa trên các tư vấn này.</li>
+        </ul>
+    
+        <h2>4. Quy tắc sử dụng</h2>
+        <p>Bạn đồng ý không sử dụng website cho bất kỳ mục đích bất hợp pháp nào hoặc các mục đích bị cấm bởi các điều khoản này. Bạn không được thực hiện bất kỳ hành động nào có thể làm hỏng, vô hiệu hóa, hoặc gây quá tải cho website.</p>
+    
+        <h2>5. Giới hạn trách nhiệm</h2>
+        <p>Trong mọi trường hợp, Tienoi.one sẽ không chịu trách nhiệm pháp lý cho bất kỳ thiệt hại nào (bao gồm nhưng không giới hạn ở thiệt hại về mất dữ liệu, lợi nhuận, hoặc gián đoạn kinh doanh) phát sinh từ việc sử dụng hoặc không thể sử dụng thông tin trên website, ngay cả khi chúng tôi đã được thông báo về khả năng xảy ra thiệt hại đó.</p>
+    
+        <h2>6. Luật điều chỉnh</h2>
+        <p>Các điều khoản và điều kiện này được điều chỉnh và giải thích theo luật pháp của Việt Nam. Mọi tranh chấp phát sinh sẽ được giải quyết tại các tòa án có thẩm quyền tại Việt Nam.</p>
+    </section>
+
+    <!-- Admin Page -->
+    <section id="admin-page" class="policy-page" style="display: none;">
+        <h1>Trang Quản Trị Sản Phẩm</h1>
+        <p>Quản lý danh sách sản phẩm. Các thay đổi sẽ được lưu vào bộ nhớ cục bộ của trình duyệt (localStorage).
+            <br><strong>Lưu ý:</strong> Đây là một tính năng mô phỏng, không kết nối với cơ sở dữ liệu thực.
+        </p>
+        <div class="admin-actions">
+            <button id="add-new-product-btn" class="cta-button">Thêm sản phẩm mới</button>
+        </div>
+        <div id="admin-product-list-container">
+            <!-- Admin product list will be injected here -->
+        </div>
+    </section>
+
+    <!-- Admin Form Modal -->
+    <div id="admin-form-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="admin-modal-close-button" class="modal-close" aria-label="Đóng">&times;</button>
+            <div class="modal-body">
+                <h2 id="admin-form-title" class="modal-section-title">Thêm/Sửa Sản Phẩm</h2>
+                <form id="admin-product-form">
+                    <input type="hidden" id="admin-form-product-name-original">
+                    <div class="form-group">
+                        <label for="admin-product-name">Tên sản phẩm</label>
+                        <input type="text" id="admin-product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-type">Loại sản phẩm</label>
+                        <input type="text" id="admin-product-type" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-price">Giá</label>
+                        <input type="text" id="admin-product-price" required>
+                    </div>
+                     <div class="form-group">
+                        <label for="admin-product-status">Trạng thái</label>
+                        <input type="text" id="admin-product-status" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-image">URL Hình ảnh</label>
+                        <input type="url" id="admin-product-image" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-link">URL Liên kết sản phẩm</label>
+                        <input type="url" id="admin-product-link" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-description">Mô tả ngắn</label>
+                        <textarea id="admin-product-description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-description-detail">Mô tả chi tiết</label>
+                        <textarea id="admin-product-description-detail" rows="6" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-product-button-text">Văn bản trên nút bấm</label>
+                        <input type="text" id="admin-product-button-text" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="cta-button">Lưu sản phẩm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal-overlay">
+      <div class="modal-content">
+        <button id="modal-close-button" class="modal-close" aria-label="Đóng">&times;</button>
+        <div class="modal-body">
+            <div class="modal-visual-column">
+                <div class="modal-image-container">
+                    <img id="modal-product-image" src="" alt="Product Image">
+                </div>
+                <div class="modal-actions-container">
+                    <a id="modal-product-link" href="#" target="_blank" rel="noopener noreferrer" class="cta-button"></a>
+                    <div class="modal-social-share">
+                        <span>Chia sẻ:</span>
+                        <a id="share-facebook" href="#" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.128 22 16.991 22 12z"></path></svg>
+                        </a>
+                        <a id="share-zalo" href="#" target="_blank" rel="noopener noreferrer" aria-label="Share on Zalo">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2zM9 13a1 1 0 110-2 1 1 0 010 2zm6 0a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                        </a>
+                        <a id="share-linkedin" href="#" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM6 9H2V21h4V9zM4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path></svg>
+                        </a>
+                        <a id="share-threads" href="#" target="_blank" rel="noopener noreferrer" aria-label="Share on Threads">
+                           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.75a10.25 10.25 0 1 0 10.25 10.25A10.25 10.25 0 0 0 12 1.75zm3.75 6.45a6.75 6.75 0 0 1-6.13 8.35 1.5 1.5 0 0 1-1.24-2.13 6.75 6.75 0 0 1 8.35-6.13 1.5 1.5 0 0 1-1 2.22c-.1.05-.2.08-.3.1a3.75 3.75 0 1 0 1-2.22 1.5 1.5 0 0 1-1.68-.2z"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-details">
+                <h2 id="modal-product-name"></h2>
+                <span id="modal-product-type"></span>
+                <div class="modal-meta-container">
+                    <div class="modal-price-status-wrapper">
+                        <div id="modal-product-price" class="product-price"></div>
+                        <span id="modal-product-status"></span>
+                    </div>
+                    <div id="modal-product-rating-stars"></div>
+                </div>
+
+                <div class="modal-tabs">
+                    <button class="modal-tab-button is-active" data-tab-target="#tab-panel-details">Thông tin chi tiết</button>
+                    <button class="modal-tab-button" data-tab-target="#tab-panel-consultant">Tư vấn chuyên gia</button>
+                    <button class="modal-tab-button" data-tab-target="#tab-panel-comments">Đánh giá của khách hàng</button>
+                </div>
+
+                <div class="modal-tab-content-container">
+                    <div id="tab-panel-details" class="modal-tab-panel is-active">
+                        <h3 class="modal-section-title">Thông tin chi tiết</h3>
+                        <p id="modal-product-description"></p>
+                    </div>
+                    <div id="tab-panel-consultant" class="modal-tab-panel">
+                        <div class="consultant-initial-message">
+                            <p>Nhận phân tích, đánh giá và đề xuất từ chuyên gia của chúng tôi để đưa ra quyết định tốt nhất.</p>
+                            <button id="generate-advice-button" class="cta-button">Tư vấn ngay</button>
+                        </div>
+                        <div id="consultant-result-container">
+                            <!-- AI content or loading spinner goes here -->
+                        </div>
+                    </div>
+                    <div id="tab-panel-comments" class="modal-tab-panel">
+                      <div id="comments-list" class="comments-list-container">
+                          <!-- Comments will be injected here by JavaScript -->
+                      </div>
+                      <div id="comments-pagination" class="comments-pagination-container">
+                          <!-- Pagination controls will be injected here by JavaScript -->
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-related-products">
+                <h3 class="modal-section-title">Sản phẩm tương tự</h3>
+                <div id="modal-related-container" class="related-products-grid">
+                    <!-- Related products will be injected here by JS -->
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
