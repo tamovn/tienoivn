@@ -951,6 +951,9 @@ async function initializeApp() {
     // Guard clauses
     if (!loadingSpinner || !resultsContainer || !blogGrid) return;
 
+    // --- Create a base URL for fetching local resources robustly ---
+    const baseUrl = new URL('.', window.location.href).href;
+
     // --- Initial UI State ---
     updatePageTitle();
     displayRecentSearches();
@@ -963,8 +966,8 @@ async function initializeApp() {
     try {
         // --- Data Loading: Use localStorage as Source of Truth ---
         const [blogResponse, commentsResponse] = await Promise.all([
-            fetch('blog.json'),
-            fetch('comments.json')
+            fetch(new URL('blog.json', baseUrl).href),
+            fetch(new URL('comments.json', baseUrl).href)
         ]);
 
         if (!blogResponse.ok || !commentsResponse.ok) {
@@ -980,7 +983,7 @@ async function initializeApp() {
         if (storedProducts) {
             allProducts = JSON.parse(storedProducts);
         } else {
-            const productsResponse = await fetch('products.json');
+            const productsResponse = await fetch(new URL('products.json', baseUrl).href);
             if (!productsResponse.ok) throw new Error('Failed to fetch initial products.json');
             const productsData: Product[] = await productsResponse.json();
             allProducts = productsData.filter(p => p.name);
