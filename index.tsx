@@ -37,6 +37,125 @@ interface ExpertAdvice {
     summary: string;
 }
 
+// --- Data: Embedded to avoid fetch issues ---
+const PRODUCTS_DATA: Product[] = [
+  {
+    "name": "Xe Đạp Điện Theli Aima",
+    "description": "Thiết kế thời trang, động cơ mạnh mẽ, phù hợp cho việc đi lại trong thành phố.",
+    "price": "15.500.000đ",
+    "link": "https://example.com/theli-aima",
+    "image": "https://i.ibb.co/L5Bwz8M/e-bike-1.jpg",
+    "type": "Xe đạp điện",
+    "status": "Còn hàng",
+    "description_detail": "Xe Đạp Điện Theli Aima là sự kết hợp hoàn hảo giữa phong cách và hiệu suất. Với pin Lithium dung lượng cao, xe có thể đi được quãng đường lên đến 70km mỗi lần sạc. Động cơ 350W mạnh mẽ giúp bạn dễ dàng vượt qua các con dốc. Hệ thống phanh đĩa an toàn, đèn LED siêu sáng.",
+    "button_text": "Xem ngay"
+  },
+  {
+    "name": "Xe Máy Điện Vinfast Evo200",
+    "description": "Quãng đường di chuyển vượt trội, công nghệ pin LFP tiên tiến, chống nước IP67.",
+    "price": "22.000.000đ",
+    "link": "https://example.com/vinfast-evo200",
+    "image": "https://i.ibb.co/h9yVzZk/e-scooter-1.jpg",
+    "type": "Xe máy điện",
+    "status": "Còn hàng",
+    "description_detail": "Vinfast Evo200 thiết lập tiêu chuẩn mới cho xe máy điện với khả năng di chuyển lên tới 200km sau một lần sạc đầy. Động cơ in-hub và công nghệ pin LFP đảm bảo độ bền và an toàn. Xe có khả năng chống nước chuẩn IP67, yên tâm di chuyển trong mọi điều kiện thời tiết.",
+    "button_text": "Khám phá"
+  },
+  {
+    "name": "Xe Đạp Gấp G-Force C14",
+    "description": "Gọn nhẹ, dễ dàng gấp gọn trong 3 bước, phù hợp cho người hay di chuyển.",
+    "price": "8.900.000đ",
+    "link": "https://example.com/g-force-c14",
+    "image": "https://i.ibb.co/D9pXG2N/folding-bike-1.jpg",
+    "type": "Xe đạp gấp",
+    "status": "Đặt trước",
+    "description_detail": "G-Force C14 là giải pháp di chuyển linh hoạt cho đô thị. Với khung hợp kim nhôm siêu nhẹ, chiếc xe có thể được gấp gọn nhanh chóng để mang lên xe bus, tàu điện hoặc cất trong cốp ô tô. Dù nhỏ gọn, xe vẫn được trang bị bộ đề 7 tốc độ và phanh đĩa an toàn.",
+    "button_text": "Đặt hàng"
+  },
+  {
+    "name": "Pin Lithium 48V-20Ah",
+    "description": "Pin thay thế cao cấp cho xe điện, tăng quãng đường, tuổi thọ cao.",
+    "price": "4.200.000đ",
+    "link": "https://example.com/pin-lithium",
+    "image": "https://i.ibb.co/qYn0S2G/battery-1.jpg",
+    "type": "Linh kiện",
+    "status": "Còn hàng",
+    "description_detail": "Nâng cấp cho xe điện của bạn với pin Lithium 48V-20Ah. Pin sử dụng cell chất lượng cao, cho dòng xả ổn định và tuổi thọ lên đến 5 năm. Vỏ nhôm chống va đập, tích hợp mạch quản lý pin (BMS) thông minh để bảo vệ chống sạc quá mức, xả quá sâu và ngắn mạch.",
+    "button_text": "Xem chi tiết"
+  },
+    {
+    "name": "Xe Máy Điện Yadea G5",
+    "description": "Thiết kế tối giản đậm chất châu Âu, động cơ GTR 2.0 độc quyền.",
+    "price": "39.990.000đ",
+    "link": "https://example.com/yadea-g5",
+    "image": "https://i.ibb.co/wJ2cR6J/e-scooter-2.jpg",
+    "type": "Xe máy điện",
+    "status": "Hết hàng",
+    "description_detail": "Yadea G5 mang vẻ đẹp hiện đại, tinh tế. Xe được trang bị màn hình LCD 7 inch, hệ thống khóa thông minh và động cơ GTR 2.0 mạnh mẽ, tiết kiệm năng lượng. Khung xe bằng thép cán lạnh cao cấp, đảm bảo độ vững chắc và an toàn tối đa.",
+    "button_text": "Xem chi tiết"
+  }
+];
+
+const ARTICLES_DATA: Article[] = [
+  {
+    "title": "5 Lợi Ích Của Việc Sử Dụng Xe Đạp Điện",
+    "description": "Khám phá những lợi ích không ngờ về sức khỏe, tài chính và môi trường khi bạn chuyển sang sử dụng xe đạp điện hàng ngày.",
+    "link": "https://example.com/blog/loi-ich-xe-dap-dien",
+    "imageURL": "https://i.ibb.co/MfZg7fG/blog-1.jpg"
+  },
+  {
+    "title": "Hướng Dẫn Bảo Dưỡng Pin Xe Máy Điện Đúng Cách",
+    "description": "Pin là trái tim của xe điện. Tìm hiểu các mẹo bảo dưỡng đơn giản để kéo dài tuổi thọ pin và đảm bảo hiệu suất tối ưu.",
+    "link": "https://example.com/blog/bao-duong-pin",
+    "imageURL": "https://i.ibb.co/tZ5tF7X/blog-2.jpg"
+  },
+  {
+    "title": "Xe Đạp Gấp: Giải Pháp Di Chuyển Thông Minh Cho Đô Thị",
+    "description": "Tại sao xe đạp gấp lại trở thành xu hướng? Chúng ta sẽ phân tích sự tiện lợi và linh hoạt mà chúng mang lại cho cuộc sống thành thị.",
+    "link": "https://example.com/blog/xu-huong-xe-dap-gap",
+    "imageURL": "https://i.ibb.co/r2kQZ7x/blog-3.jpg"
+  }
+];
+
+const COMMENTS_DATA: Comment[] = [
+  {
+    "product_type": "Xe đạp điện",
+    "author": "Minh Anh",
+    "text": "Xe Theli Aima đi êm thật, thiết kế đẹp, bạn bè ai cũng khen. Sạc cũng nhanh đầy nữa.",
+    "date": "20/05/2024"
+  },
+  {
+    "product_type": "Xe máy điện",
+    "author": "Tuấn Khải",
+    "text": "Mua Vinfast Evo200 không hối hận. Đi làm cả tuần mới phải sạc một lần, quá tiện. Xe đi đầm và chắc chắn.",
+    "date": "18/05/2024"
+  },
+  {
+    "product_type": "Xe đạp gấp",
+    "author": "Phương Linh",
+    "text": "Mình rất thích chiếc G-Force C14. Mỗi cuối tuần mình đều bỏ nó vào cốp xe đi dã ngoại. Gấp mở rất dễ dàng.",
+    "date": "15/05/2024"
+  },
+  {
+    "product_type": "Linh kiện",
+    "author": "Bảo Nam",
+    "text": "Pin Lithium 48V-20Ah này tốt hơn hẳn ắc quy cũ của mình. Xe chạy bốc hơn và đi được xa hơn nhiều.",
+    "date": "12/05/2024"
+  },
+  {
+    "product_type": "Xe máy điện",
+    "author": "An Nhiên",
+    "text": "Tiếc là Yadea G5 đang hết hàng, mình rất thích mẫu này. Hi vọng shop sớm nhập hàng về lại.",
+    "date": "10/05/2024"
+  },
+  {
+    "product_type": "Xe đạp điện",
+    "author": "Quốc Trung",
+    "text": "Tìm mãi mới được một chiếc xe đạp điện ưng ý. Nhân viên tư vấn nhiệt tình, sẽ giới thiệu bạn bè.",
+    "date": "05/05/2024"
+  }
+];
+
 
 // --- Global Constants & Variables ---
 const RECENT_SEARCHES_KEY = 'thegioixedien_recent_searches';
@@ -947,12 +1066,9 @@ function performSearch(query: string) {
   if (loadingSpinner) loadingSpinner.style.display = 'none';
 }
 
-async function initializeApp() {
+function initializeApp() {
     // Guard clauses
     if (!loadingSpinner || !resultsContainer || !blogGrid) return;
-
-    // --- Create a base URL for fetching local resources robustly ---
-    const baseUrl = new URL('.', window.location.href).href;
 
     // --- Initial UI State ---
     updatePageTitle();
@@ -964,29 +1080,17 @@ async function initializeApp() {
     if (blogSpinner) blogSpinner.style.display = 'block';
 
     try {
-        // --- Data Loading: Use localStorage as Source of Truth ---
-        const [blogResponse, commentsResponse] = await Promise.all([
-            fetch(new URL('blog.json', baseUrl).href),
-            fetch(new URL('comments.json', baseUrl).href)
-        ]);
-
-        if (!blogResponse.ok || !commentsResponse.ok) {
-            throw new Error('Failed to fetch blog or comments JSON data files.');
-        }
-
-        const articles: Article[] = await blogResponse.json();
-        const commentsData: Comment[] = await commentsResponse.json();
-        allComments = commentsData;
+        // --- Data Loading: Use embedded data to guarantee availability ---
+        allComments = COMMENTS_DATA;
+        const articles = ARTICLES_DATA;
         
-        // Load products from localStorage or seed from JSON
+        // Load products from localStorage or seed from embedded data
         const storedProducts = localStorage.getItem(MANAGED_PRODUCTS_KEY);
         if (storedProducts) {
             allProducts = JSON.parse(storedProducts);
         } else {
-            const productsResponse = await fetch(new URL('products.json', baseUrl).href);
-            if (!productsResponse.ok) throw new Error('Failed to fetch initial products.json');
-            const productsData: Product[] = await productsResponse.json();
-            allProducts = productsData.filter(p => p.name);
+            // Filter out any potentially empty/invalid entries from the source data
+            allProducts = PRODUCTS_DATA.filter(p => p.name);
             localStorage.setItem(MANAGED_PRODUCTS_KEY, JSON.stringify(allProducts));
         }
 
