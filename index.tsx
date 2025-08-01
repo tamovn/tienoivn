@@ -1,4 +1,3 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -168,7 +167,6 @@ const MANAGED_PRODUCTS_KEY = 'thegioixedien_managed_products';
 
 let allProducts: Product[] = [];
 let allComments: Comment[] = [];
-const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
 let currentModalProduct: Product | null = null;
 const DEFAULT_PAGE_TITLE = "Tienoi.one - Khám phá Sản phẩm & Dịch vụ";
 let featuredProductsCurrentPage = 1;
@@ -930,11 +928,15 @@ function displayBlogPosts(articles: Article[]) {
 // --- Search Logic ---
 /**
  * Generates expert advice for a given product using the Gemini API.
+ * This function is self-contained and handles its own errors gracefully.
  * @param product The product to analyze.
- * @returns A string containing the formatted HTML advice.
+ * @returns A string containing the formatted HTML advice or an error message.
  */
 async function generateExpertAdvice(product: Product): Promise<string> {
     try {
+        // Initialize AI client just-in-time to prevent app crash if API_KEY is missing.
+        const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
+
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: `Act as an impartial expert product consultant. Based on the following product information, provide a concise analysis in Vietnamese for a potential customer.
@@ -976,7 +978,9 @@ async function generateExpertAdvice(product: Product): Promise<string> {
 
     } catch (error) {
         console.error("Gemini API call for advice failed:", error);
-        throw error; // Re-throw to be caught by the caller
+        // This catch block handles both API key errors and other API failures,
+        // returning a user-facing error message directly.
+        return `<p class="initial-message">Rất tiếc, tính năng tư vấn chuyên gia đang tạm thời gián đoạn. Vui lòng thử lại sau.</p>`;
     }
 }
 
@@ -1565,13 +1569,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (consultantInitialMessage) consultantInitialMessage.style.display = 'none';
                 if (consultantResultContainer) {
                     consultantResultContainer.innerHTML = `<div class="loading-spinner" style="display: block;"></div>`;
-                    try {
-                        const adviceHtml = await generateExpertAdvice(currentModalProduct);
-                        consultantResultContainer.innerHTML = adviceHtml;
-                    } catch (error) {
-                        console.error("Failed to generate expert advice:", error);
-                        consultantResultContainer.innerHTML = `<p class="initial-message">Đã xảy ra lỗi khi tạo tư vấn. Vui lòng thử lại sau.</p>`;
-                    }
+                    const adviceHtml = await generateExpertAdvice(currentModalProduct);
+                    consultantResultContainer.innerHTML = adviceHtml;
                 }
             });
         }
