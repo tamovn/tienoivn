@@ -963,8 +963,8 @@ async function initializeApp() {
     try {
         // --- Data Loading: Use localStorage as Source of Truth ---
         const [blogResponse, commentsResponse] = await Promise.all([
-            fetch('/blog.json'),
-            fetch('/comments.json')
+            fetch('blog.json'),
+            fetch('comments.json')
         ]);
 
         if (!blogResponse.ok || !commentsResponse.ok) {
@@ -980,7 +980,7 @@ async function initializeApp() {
         if (storedProducts) {
             allProducts = JSON.parse(storedProducts);
         } else {
-            const productsResponse = await fetch('/products.json');
+            const productsResponse = await fetch('products.json');
             if (!productsResponse.ok) throw new Error('Failed to fetch initial products.json');
             const productsData: Product[] = await productsResponse.json();
             allProducts = productsData.filter(p => p.name);
