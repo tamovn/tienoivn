@@ -1080,19 +1080,35 @@ function initializeApp() {
     if (blogSpinner) blogSpinner.style.display = 'block';
 
     try {
-        // --- Data Loading: Use embedded data to guarantee availability ---
+        // --- Data Loading ---
         allComments = COMMENTS_DATA;
         const articles = ARTICLES_DATA;
         
-        // Load products from localStorage or seed from embedded data
-        const storedProducts = localStorage.getItem(MANAGED_PRODUCTS_KEY);
-        if (storedProducts) {
-            allProducts = JSON.parse(storedProducts);
+        // **Robust Product Loading from localStorage with Fallback**
+        let loadedProducts: Product[] = [];
+        try {
+            const storedProducts = localStorage.getItem(MANAGED_PRODUCTS_KEY);
+            if (storedProducts) {
+                const parsedProducts = JSON.parse(storedProducts);
+                // Validate that the parsed data is a non-empty array with valid items
+                if (Array.isArray(parsedProducts) && parsedProducts.length > 0 && parsedProducts[0].name) {
+                    loadedProducts = parsedProducts;
+                }
+            }
+        } catch (error) {
+            console.error("Failed to parse products from localStorage:", error);
+            // If parsing fails, loadedProducts remains empty, triggering the fallback.
+        }
+
+        // If localStorage is empty, invalid, or corrupted, use embedded data as the source of truth
+        if (loadedProducts.length > 0) {
+            allProducts = loadedProducts;
         } else {
-            // Filter out any potentially empty/invalid entries from the source data
-            allProducts = PRODUCTS_DATA.filter(p => p.name);
+            allProducts = PRODUCTS_DATA.filter(p => p && p.name); // Use embedded data
+            // Persist the good default data back to localStorage to self-correct the state
             localStorage.setItem(MANAGED_PRODUCTS_KEY, JSON.stringify(allProducts));
         }
+
 
         // --- UI Population ---
         displaySmartSuggestions(allProducts);
