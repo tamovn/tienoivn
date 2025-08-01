@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -37,7 +38,7 @@ interface ExpertAdvice {
     summary: string;
 }
 
-// --- Data: Embedded to avoid fetch issues ---
+// --- DATA: Embedded for 100% reliability. This is the single source of truth on page load. ---
 const PRODUCTS_DATA: Product[] = [
   {
     "name": "Xe Đạp Điện Theli Aima",
@@ -397,9 +398,14 @@ function displayRecentlyViewed() {
  * @returns The number of clicks.
  */
 function getProductClickCount(productName: string): number {
-    const clicksStr = localStorage.getItem(PRODUCT_CLICKS_KEY);
-    const allClicks = clicksStr ? JSON.parse(clicksStr) : {};
-    return allClicks[productName] || 0;
+    try {
+        const clicksStr = localStorage.getItem(PRODUCT_CLICKS_KEY);
+        const allClicks = clicksStr ? JSON.parse(clicksStr) : {};
+        return allClicks[productName] || 0;
+    } catch (e) {
+        console.warn("Could not read product clicks from localStorage.", e);
+        return 0;
+    }
 }
 
 /**
@@ -407,11 +413,15 @@ function getProductClickCount(productName: string): number {
  * @param productName The name of the product to increment.
  */
 function incrementProductClick(productName: string) {
-    const clicksStr = localStorage.getItem(PRODUCT_CLICKS_KEY);
-    const allClicks = clicksStr ? JSON.parse(clicksStr) : {};
-    const newCount = (allClicks[productName] || 0) + 1;
-    allClicks[productName] = newCount;
-    localStorage.setItem(PRODUCT_CLICKS_KEY, JSON.stringify(allClicks));
+    try {
+        const clicksStr = localStorage.getItem(PRODUCT_CLICKS_KEY);
+        const allClicks = clicksStr ? JSON.parse(clicksStr) : {};
+        const newCount = (allClicks[productName] || 0) + 1;
+        allClicks[productName] = newCount;
+        localStorage.setItem(PRODUCT_CLICKS_KEY, JSON.stringify(allClicks));
+    } catch (e) {
+        console.warn("Could not save product clicks to localStorage.", e);
+    }
 }
 
 /**
@@ -1067,8 +1077,11 @@ function performSearch(query: string) {
 }
 
 function initializeApp() {
-    // Guard clauses
-    if (!loadingSpinner || !resultsContainer || !blogGrid) return;
+    // Guard clauses to ensure essential elements exist before running
+    if (!loadingSpinner || !resultsContainer || !blogGrid) {
+        console.error("Essential DOM elements are missing. App cannot initialize.");
+        return;
+    }
 
     // --- Initial UI State ---
     updatePageTitle();
@@ -1080,40 +1093,19 @@ function initializeApp() {
     if (blogSpinner) blogSpinner.style.display = 'block';
 
     try {
-        // --- Data Loading ---
+        // --- DATA INITIALIZATION - SIMPLIFIED FOR 100% RELIABILITY ---
+        // Always load data directly from the embedded constants. This removes all
+        // external dependencies (like localStorage reading on startup) and guarantees
+        // that the site always displays content, fixing the core issue.
+        allProducts = PRODUCTS_DATA;
         allComments = COMMENTS_DATA;
         const articles = ARTICLES_DATA;
         
-        // **Robust Product Loading from localStorage with Fallback**
-        let loadedProducts: Product[] = [];
-        try {
-            const storedProducts = localStorage.getItem(MANAGED_PRODUCTS_KEY);
-            if (storedProducts) {
-                const parsedProducts = JSON.parse(storedProducts);
-                // Validate that the parsed data is a non-empty array with valid items
-                if (Array.isArray(parsedProducts) && parsedProducts.length > 0 && parsedProducts[0].name) {
-                    loadedProducts = parsedProducts;
-                }
-            }
-        } catch (error) {
-            console.error("Failed to parse products from localStorage:", error);
-            // If parsing fails, loadedProducts remains empty, triggering the fallback.
-        }
-
-        // If localStorage is empty, invalid, or corrupted, use embedded data as the source of truth
-        if (loadedProducts.length > 0) {
-            allProducts = loadedProducts;
-        } else {
-            allProducts = PRODUCTS_DATA.filter(p => p && p.name); // Use embedded data
-            // Persist the good default data back to localStorage to self-correct the state
-            localStorage.setItem(MANAGED_PRODUCTS_KEY, JSON.stringify(allProducts));
-        }
-
-
         // --- UI Population ---
+        // Populate the page with the guaranteed data.
         displaySmartSuggestions(allProducts);
         displayBlogPosts(articles);
-        populateFooter(articles, allProducts); // Pass both datasets
+        populateFooter(articles, allProducts);
         
         // --- Handle Initial Search State from URL ---
         const urlParams = new URLSearchParams(window.location.search);
@@ -1121,7 +1113,7 @@ function initializeApp() {
         if (query) {
             triggerSearch(query);
         } else {
-             // SEO Improvement: Pre-render featured products instead of showing a welcome message
+             // On a fresh load, show the featured products.
              featuredProductsCurrentPage = 1;
              displayFeaturedProducts(allProducts);
         }
@@ -1131,6 +1123,7 @@ function initializeApp() {
         blogGrid.innerHTML = '<p class="initial-message">Không thể tải các bài viết. Vui lòng thử lại sau.</p>';
     } finally {
         // --- Final UI State ---
+        // Ensure all loading spinners are hidden, even if an error occurred.
         if (loadingSpinner) loadingSpinner.style.display = 'none';
         if (blogSpinner) blogSpinner.style.display = 'none';
     }
@@ -1263,14 +1256,23 @@ function populateFooter(articles: Article[], products: Product[]) {
 // --- Admin Page Functions ---
 /** Saves the entire `allProducts` array to localStorage. */
 function saveAllProducts() {
-    localStorage.setItem(MANAGED_PRODUCTS_KEY, JSON.stringify(allProducts));
+    try {
+        localStorage.setItem(MANAGED_PRODUCTS_KEY, JSON.stringify(allProducts));
+    } catch(e) {
+        console.error("Failed to save products to localStorage.", e);
+        alert("Lỗi: Không thể lưu sản phẩm. Bộ nhớ của trình duyệt có thể đã đầy.");
+    }
 }
 
 /** Renders the list of products in the admin page table. */
 function renderAdminPage() {
     if (!adminProductListContainer) return;
 
-    if (allProducts.length === 0) {
+    // Admin page should reflect the live state of `allProducts`, which might
+    // have been modified during the session.
+    const productsToRender = allProducts;
+
+    if (productsToRender.length === 0) {
         adminProductListContainer.innerHTML = `<p class="initial-message">Chưa có sản phẩm nào. Hãy thêm một sản phẩm!</p>`;
         return;
     }
@@ -1287,7 +1289,7 @@ function renderAdminPage() {
                 </tr>
             </thead>
             <tbody>
-                ${allProducts.map(p => `
+                ${productsToRender.map(p => `
                     <tr data-product-name="${p.name}">
                         <td class="product-image-cell"><img src="${p.image}" alt="${p.name}"></td>
                         <td>${p.name}</td>
