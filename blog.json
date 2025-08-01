@@ -1,0 +1,21 @@
+
+[
+  {
+    "title": "5 Lợi Ích Của Việc Sử Dụng Xe Đạp Điện",
+    "description": "Khám phá những lợi ích không ngờ về sức khỏe, tài chính và môi trường khi bạn chuyển sang sử dụng xe đạp điện hàng ngày.",
+    "link": "https://example.com/blog/loi-ich-xe-dap-dien",
+    "imageURL": "https://i.ibb.co/MfZg7fG/blog-1.jpg"
+  },
+  {
+    "title": "Hướng Dẫn Bảo Dưỡng Pin Xe Máy Điện Đúng Cách",
+    "description": "Pin là trái tim của xe điện. Tìm hiểu các mẹo bảo dưỡng đơn giản để kéo dài tuổi thọ pin và đảm bảo hiệu suất tối ưu.",
+    "link": "https://example.com/blog/bao-duong-pin",
+    "imageURL": "https://i.ibb.co/tZ5tF7X/blog-2.jpg"
+  },
+  {
+    "title": "Xe Đạp Gấp: Giải Pháp Di Chuyển Thông Minh Cho Đô Thị",
+    "description": "Tại sao xe đạp gấp lại trở thành xu hướng? Chúng ta sẽ phân tích sự tiện lợi và linh hoạt mà chúng mang lại cho cuộc sống thành thị.",
+    "link": "https://example.com/blog/xu-huong-xe-dap-gap",
+    "imageURL": "https://i.ibb.co/r2kQZ7x/blog-3.jpg"
+  }
+]
