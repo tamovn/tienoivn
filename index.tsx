@@ -2,7 +2,6 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import { GoogleGenAI, Type } from "@google/genai";
 
 // --- Type Interfaces ---
 interface Product {
@@ -24,7 +23,7 @@ interface Article {
   imageURL: string;
 }
 
-interface Comment {
+interface ProductComment {
   product_type: string;
   author: string;
   text: string;
@@ -117,7 +116,7 @@ const ARTICLES_DATA: Article[] = [
   }
 ];
 
-const COMMENTS_DATA: Comment[] = [
+const COMMENTS_DATA: ProductComment[] = [
   {
     "product_type": "Xe đạp điện",
     "author": "Minh Anh",
@@ -166,7 +165,7 @@ const PRODUCT_CLICKS_KEY = 'thegioixedien_product_clicks';
 const MANAGED_PRODUCTS_KEY = 'thegioixedien_managed_products';
 
 let allProducts: Product[] = [];
-let allComments: Comment[] = [];
+let allComments: ProductComment[] = [];
 let currentModalProduct: Product | null = null;
 const DEFAULT_PAGE_TITLE = "Tienoi.one - Khám phá Sản phẩm & Dịch vụ";
 let featuredProductsCurrentPage = 1;
@@ -730,7 +729,7 @@ function createRelatedProductCard(product: Product): HTMLElement {
  * @param comment The comment data.
  * @returns An HTML element representing the comment card.
  */
-function createCommentCard(comment: Comment): HTMLElement {
+function createCommentCard(comment: ProductComment): HTMLElement {
     const card = document.createElement('div');
     card.className = 'comment-card';
     const avatarText = comment.author ? comment.author.substring(0, 1).toUpperCase() : '?';
@@ -927,86 +926,17 @@ function displayBlogPosts(articles: Article[]) {
 
 // --- Search Logic ---
 /**
- * Generates expert advice for a given product using the Gemini API.
- * This function is self-contained and handles its own errors gracefully.
+ * Generates expert advice for a given product.
+ * This function is temporarily disabled to ensure application stability.
+ * It returns a static maintenance message.
  * @param product The product to analyze.
- * @returns A string containing the formatted HTML advice or an error message.
+ * @returns A string containing the formatted HTML message.
  */
-async function generateExpertAdvice(product: Product): Promise<string> {
-    try {
-        // Initialize AI client just-in-time to prevent app crash if API_KEY is missing.
-        const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
-
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: `Act as an impartial expert product consultant. Based on the following product information, provide a concise analysis in Vietnamese for a potential customer.
-            Product Name: ${product.name}
-            Product Price: ${product.price}
-            Product Description: ${product.description_detail || product.description}
-
-            Your analysis should highlight key advantages, points to consider (including an evaluation of the price in relation to the described features and benefits), and a final summary about its overall value.
-            `,
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        advantages: {
-                            type: Type.ARRAY,
-                            description: 'Key advantages of the product, in Vietnamese.',
-                            items: { type: Type.STRING }
-                        },
-                        considerations: {
-                            type: Type.ARRAY,
-                            description: 'Points for the customer to consider, or potential drawbacks, in Vietnamese. This should include a comment on the price vs. value.',
-                            items: { type: Type.STRING }
-                        },
-                        summary: {
-                            type: Type.STRING,
-                            description: 'A final summary and recommendation about the product\'s overall value, in Vietnamese.'
-                        }
-                    },
-                    required: ['advantages', 'considerations', 'summary']
-                },
-            },
-        });
-
-        const jsonStr = response.text.trim();
-        const advice: ExpertAdvice = JSON.parse(jsonStr);
-
-        return formatAdviceToHtml(advice);
-
-    } catch (error) {
-        console.error("Gemini API call for advice failed:", error);
-        // This catch block handles both API key errors and other API failures,
-        // returning a user-facing error message directly.
-        return `<p class="initial-message">Rất tiếc, tính năng tư vấn chuyên gia đang tạm thời gián đoạn. Vui lòng thử lại sau.</p>`;
-    }
+function generateExpertAdvice(product: Product): string {
+    console.log("AI Expert Advice feature called for:", product.name);
+    return `<p class="initial-message">Tính năng tư vấn chuyên gia đang được bảo trì để nâng cấp. Vui lòng quay lại sau. Cảm ơn bạn!</p>`;
 }
 
-/**
- * Formats the AI-generated advice into an HTML string.
- * @param advice The advice object from the API.
- * @returns An HTML string.
- */
-function formatAdviceToHtml(advice: ExpertAdvice): string {
-    const advantagesHtml = advice.advantages.length > 0
-        ? `<ul>${advice.advantages.map(item => `<li>${item}</li>`).join('')}</ul>`
-        : '<p>Không có ưu điểm đặc biệt nào được ghi nhận.</p>';
-
-    const considerationsHtml = advice.considerations.length > 0
-        ? `<ul>${advice.considerations.map(item => `<li>${item}</li>`).join('')}</ul>`
-        : '<p>Không có điểm cần cân nhắc đặc biệt.</p>';
-        
-    return `
-        <h4>Ưu điểm nổi bật</h4>
-        ${advantagesHtml}
-        <h4>Điểm cần cân nhắc</h4>
-        ${considerationsHtml}
-        <h4>Kết luận của chuyên gia</h4>
-        <p class="summary">${advice.summary}</p>
-    `;
-}
 
 function triggerSearch(query: string) {
     if (query) {
@@ -1560,7 +1490,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // AI Consultant Tab listener
         const generateAdviceButton = document.getElementById('generate-advice-button') as HTMLButtonElement;
         if (generateAdviceButton) {
-            generateAdviceButton.addEventListener('click', async () => {
+            generateAdviceButton.addEventListener('click', () => {
                 if (!currentModalProduct) return;
 
                 const consultantInitialMessage = document.querySelector('#tab-panel-consultant .consultant-initial-message') as HTMLElement;
@@ -1568,8 +1498,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (consultantInitialMessage) consultantInitialMessage.style.display = 'none';
                 if (consultantResultContainer) {
-                    consultantResultContainer.innerHTML = `<div class="loading-spinner" style="display: block;"></div>`;
-                    const adviceHtml = await generateExpertAdvice(currentModalProduct);
+                    const adviceHtml = generateExpertAdvice(currentModalProduct);
                     consultantResultContainer.innerHTML = adviceHtml;
                 }
             });
