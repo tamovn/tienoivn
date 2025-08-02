@@ -1,4 +1,3 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -94,8 +93,8 @@ function isValidComment(item: any): item is Comment {
 
 
 /**
- * Fetches, validates, and caches data from a given JSON file with retry logic.
- * @param url The URL of the JSON file.
+ * Fetches, validates, and caches data from a given URL with retry logic.
+ * @param url The URL of the data source (e.g., a .php file).
  * @param validator A function to validate each item in the fetched array.
  * @returns A promise resolving with the validated data.
  */
@@ -139,7 +138,7 @@ async function fetchData<T>(url: string, validator: (item: any) => item is T): P
  * @returns A promise that resolves to an array of valid Product objects.
  */
 export const getProducts = (): Promise<Product[]> => {
-    return fetchData<Product>('/products.json', isValidProduct);
+    return fetchData<Product>('products.json', isValidProduct);
 }
 
 /**
@@ -147,7 +146,7 @@ export const getProducts = (): Promise<Product[]> => {
  * @returns A promise that resolves to an array of valid Article objects.
  */
 export const getArticles = (): Promise<Article[]> => {
-    return fetchData<Article>('/articles.json', isValidArticle);
+    return fetchData<Article>('articles.json', isValidArticle);
 }
 
 /**
@@ -155,5 +154,5 @@ export const getArticles = (): Promise<Article[]> => {
  * @returns A promise that resolves to an array of valid Comment objects.
  */
 export const getComments = (): Promise<Comment[]> => {
-    return fetchData<Comment>('/comments.json', isValidComment);
+    return fetchData<Comment>('comments.json', isValidComment);
 }
