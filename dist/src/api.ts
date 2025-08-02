@@ -32,19 +32,8 @@ export interface Comment {
 
 // --- Environment and Fetch Configuration ---
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-
-const BASE_PATH = isProduction ? '/data' : '/mock'; // fetch từ public/data trong production
-
-export const getProducts = async () => {
-  const res = await fetch('/data/products.json'); // ĐƯỜNG DẪN TUYỆT ĐỐI
-  if (!res.ok) throw new Error('Cannot fetch products');
-  return await res.json();
-};
-export const getProducts = async () => {
-  const res = await fetch('/data/articles.json'); // ĐƯỜNG DẪN TUYỆT ĐỐI
-  if (!res.ok) throw new Error('Cannot fetch articles');
-  return await res.json();
-};
+const FETCH_RETRIES = 3;
+const RETRY_DELAY = 500; // ms
 
 // --- Data Validation ---
 
@@ -149,7 +138,7 @@ async function fetchData<T>(url: string, validator: (item: any) => item is T): P
  * @returns A promise that resolves to an array of valid Product objects.
  */
 export const getProducts = (): Promise<Product[]> => {
-    return fetchData<Product>('products.json', isValidProduct);
+    return fetchData<Product>('data/products.json', isValidProduct);
 }
 
 /**
@@ -157,7 +146,7 @@ export const getProducts = (): Promise<Product[]> => {
  * @returns A promise that resolves to an array of valid Article objects.
  */
 export const getArticles = (): Promise<Article[]> => {
-    return fetchData<Article>('articles.json', isValidArticle);
+    return fetchData<Article>('data/articles.json', isValidArticle);
 }
 
 /**
@@ -165,5 +154,5 @@ export const getArticles = (): Promise<Article[]> => {
  * @returns A promise that resolves to an array of valid Comment objects.
  */
 export const getComments = (): Promise<Comment[]> => {
-    return fetchData<Comment>('comments.json', isValidComment);
+    return fetchData<Comment>('data/comments.json', isValidComment);
 }
