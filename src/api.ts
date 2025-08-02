@@ -36,12 +36,12 @@ const isProduction = window.location.hostname !== 'localhost' && window.location
 const BASE_PATH = isProduction ? '/data' : '/mock'; // fetch từ public/data trong production
 
 export const getProducts = async () => {
-  const res = await fetch(`${BASE_PATH}/products.json`);
+  const res = await fetch('/data/products.json'); // ĐƯỜNG DẪN TUYỆT ĐỐI
   if (!res.ok) throw new Error('Cannot fetch products');
   return await res.json();
 };
-export const getArticles = async () => {
-  const res = await fetch(`${BASE_PATH}/articles.json`);
+export const getProducts = async () => {
+  const res = await fetch('/data/articles.json'); // ĐƯỜNG DẪN TUYỆT ĐỐI
   if (!res.ok) throw new Error('Cannot fetch articles');
   return await res.json();
 };
