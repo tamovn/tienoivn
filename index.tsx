@@ -1,10 +1,9 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 import { GoogleGenAI, Type } from "@google/genai";
-import { getProducts, getArticles, getComments, Product, Article, Comment } from './api.ts';
+import { getProducts, getArticles, getComments, Product, Article, Comment } from './api.js';
 
 
 // --- Type Interfaces ---
@@ -966,6 +965,32 @@ function performSearch(query: string) {
   if (loadingSpinner) loadingSpinner.style.display = 'none';
 }
 
+/**
+ * Loads initial products, prioritizing managed products from localStorage
+ * over the default JSON file. This ensures admin changes are persistent.
+ * @returns A promise that resolves to an array of Product objects.
+ */
+async function loadInitialProducts(): Promise<Product[]> {
+    try {
+        const managedProductsStr = localStorage.getItem(MANAGED_PRODUCTS_KEY);
+        if (managedProductsStr) {
+            const managedProducts = JSON.parse(managedProductsStr);
+            if (Array.isArray(managedProducts) && managedProducts.length > 0) {
+                console.log("Loaded products from localStorage (Admin).");
+                return managedProducts;
+            }
+        }
+    } catch (e) {
+        console.warn("Could not parse managed products from localStorage.", e);
+        // Clear corrupted data
+        localStorage.removeItem(MANAGED_PRODUCTS_KEY);
+    }
+    
+    // Fallback to fetching from JSON if localStorage is empty or corrupted
+    console.log("Fetching default products from products.json.");
+    return getProducts();
+}
+
 async function initializeApp() {
     // Guard clauses to ensure essential elements exist before running
     if (!loadingSpinner || !resultsContainer || !blogGrid) {
@@ -985,7 +1010,7 @@ async function initializeApp() {
     try {
         // --- DATA INITIALIZATION - Fetch from JSON files ---
         const [products, articles, comments] = await Promise.all([
-            getProducts(),
+            loadInitialProducts(), // Use the new function to load products
             getArticles(),
             getComments()
         ]);
