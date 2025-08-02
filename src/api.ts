@@ -32,8 +32,19 @@ export interface Comment {
 
 // --- Environment and Fetch Configuration ---
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-const FETCH_RETRIES = 3;
-const RETRY_DELAY = 500; // ms
+
+const BASE_PATH = isProduction ? '/data' : '/mock'; // fetch từ public/data trong production
+
+export const getProducts = async () => {
+  const res = await fetch(`${BASE_PATH}/products.json`);
+  if (!res.ok) throw new Error('Cannot fetch products');
+  return await res.json();
+};
+export const getArticles = async () => {
+  const res = await fetch(`${BASE_PATH}/articles.json`);
+  if (!res.ok) throw new Error('Cannot fetch articles');
+  return await res.json();
+};
 
 // --- Data Validation ---
 
