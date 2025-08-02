@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { GoogleGenAI, Type } from "@google/genai";
-import { getProducts, getArticles, getComments, Product, Article, Comment } from './api.ts';
+import { getProducts, getArticles, getComments, Product, Article, Comment } from './api.js';
 
 
 // --- Type Interfaces ---
