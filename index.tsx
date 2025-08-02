@@ -2,6 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
+import { GoogleGenAI, Type } from "@google/genai";
 
 // --- Type Interfaces ---
 interface Product {
@@ -23,7 +24,7 @@ interface Article {
   imageURL: string;
 }
 
-interface ProductComment {
+interface Comment {
   product_type: string;
   author: string;
   text: string;
@@ -116,7 +117,7 @@ const ARTICLES_DATA: Article[] = [
   }
 ];
 
-const COMMENTS_DATA: ProductComment[] = [
+const COMMENTS_DATA: Comment[] = [
   {
     "product_type": "Xe đạp điện",
     "author": "Minh Anh",
@@ -165,7 +166,7 @@ const PRODUCT_CLICKS_KEY = 'thegioixedien_product_clicks';
 const MANAGED_PRODUCTS_KEY = 'thegioixedien_managed_products';
 
 let allProducts: Product[] = [];
-let allComments: ProductComment[] = [];
+let allComments: Comment[] = [];
 let currentModalProduct: Product | null = null;
 const DEFAULT_PAGE_TITLE = "Tienoi.one - Khám phá Sản phẩm & Dịch vụ";
 let featuredProductsCurrentPage = 1;
@@ -318,8 +319,14 @@ function initNavSwipe() {
 
 // --- Recently Searched Functions ---
 function getRecentSearches(): string[] {
-  const searches = localStorage.getItem(RECENT_SEARCHES_KEY);
-  return searches ? JSON.parse(searches) : [];
+  try {
+    const searches = localStorage.getItem(RECENT_SEARCHES_KEY);
+    return searches ? JSON.parse(searches) : [];
+  } catch (e) {
+    console.warn("Could not parse recent searches from localStorage.", e);
+    localStorage.removeItem(RECENT_SEARCHES_KEY);
+    return [];
+  }
 }
 
 function saveRecentSearch(query: string) {
@@ -357,8 +364,14 @@ function displayRecentSearches() {
 
 // --- Recently Viewed Functions ---
 function getRecentlyViewed(): Product[] {
-  const items = localStorage.getItem(RECENTLY_VIEWED_KEY);
-  return items ? JSON.parse(items) : [];
+  try {
+    const items = localStorage.getItem(RECENTLY_VIEWED_KEY);
+    return items ? JSON.parse(items) : [];
+  } catch (e) {
+    console.warn("Could not parse recently viewed items from localStorage.", e);
+    localStorage.removeItem(RECENTLY_VIEWED_KEY);
+    return [];
+  }
 }
 
 function saveToRecentlyViewed(product: Product) {
@@ -729,7 +742,7 @@ function createRelatedProductCard(product: Product): HTMLElement {
  * @param comment The comment data.
  * @returns An HTML element representing the comment card.
  */
-function createCommentCard(comment: ProductComment): HTMLElement {
+function createCommentCard(comment: Comment): HTMLElement {
     const card = document.createElement('div');
     card.className = 'comment-card';
     const avatarText = comment.author ? comment.author.substring(0, 1).toUpperCase() : '?';
@@ -774,12 +787,22 @@ function displayFeaturedProducts(products: Product[]) {
     if (!products || products.length === 0) return;
 
     // Get all clicks and sort products by popularity
-    const clicksStr = localStorage.getItem(PRODUCT_CLICKS_KEY);
-    const allClicks = clicksStr ? JSON.parse(clicksStr) : {};
+    let allClicks = {};
+    try {
+        const clicksStr = localStorage.getItem(PRODUCT_CLICKS_KEY);
+        if (clicksStr) {
+            allClicks = JSON.parse(clicksStr);
+        }
+    } catch (e) {
+        console.warn("Could not parse product clicks from localStorage.", e);
+        localStorage.removeItem(PRODUCT_CLICKS_KEY); // Clear corrupted data
+        allClicks = {};
+    }
+
 
     const productsWithClicks = products.map(p => ({
         ...p,
-        clicks: allClicks[p.name] || 0
+        clicks: (allClicks as any)[p.name] || 0
     }));
 
     productsWithClicks.sort((a, b) => b.clicks - a.clicks);
@@ -926,17 +949,86 @@ function displayBlogPosts(articles: Article[]) {
 
 // --- Search Logic ---
 /**
- * Generates expert advice for a given product.
- * This function is temporarily disabled to ensure application stability.
- * It returns a static maintenance message.
+ * Generates expert advice for a given product using the Gemini API.
+ * This function is self-contained and handles its own errors gracefully.
  * @param product The product to analyze.
- * @returns A string containing the formatted HTML message.
+ * @returns A string containing the formatted HTML advice or an error message.
  */
-function generateExpertAdvice(product: Product): string {
-    console.log("AI Expert Advice feature called for:", product.name);
-    return `<p class="initial-message">Tính năng tư vấn chuyên gia đang được bảo trì để nâng cấp. Vui lòng quay lại sau. Cảm ơn bạn!</p>`;
+async function generateExpertAdvice(product: Product): Promise<string> {
+    try {
+        // Initialize AI client just-in-time to prevent app crash if API_KEY is missing.
+        const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: `Act as an impartial expert product consultant. Based on the following product information, provide a concise analysis in Vietnamese for a potential customer.
+            Product Name: ${product.name}
+            Product Price: ${product.price}
+            Product Description: ${product.description_detail || product.description}
+
+            Your analysis should highlight key advantages, points to consider (including an evaluation of the price in relation to the described features and benefits), and a final summary about its overall value.
+            `,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        advantages: {
+                            type: Type.ARRAY,
+                            description: 'Key advantages of the product, in Vietnamese.',
+                            items: { type: Type.STRING }
+                        },
+                        considerations: {
+                            type: Type.ARRAY,
+                            description: 'Points for the customer to consider, or potential drawbacks, in Vietnamese. This should include a comment on the price vs. value.',
+                            items: { type: Type.STRING }
+                        },
+                        summary: {
+                            type: Type.STRING,
+                            description: 'A final summary and recommendation about the product\'s overall value, in Vietnamese.'
+                        }
+                    },
+                    required: ['advantages', 'considerations', 'summary']
+                },
+            },
+        });
+
+        const jsonStr = response.text.trim();
+        const advice: ExpertAdvice = JSON.parse(jsonStr);
+
+        return formatAdviceToHtml(advice);
+
+    } catch (error) {
+        console.error("Gemini API call for advice failed:", error);
+        // This catch block handles both API key errors and other API failures,
+        // returning a user-facing error message directly.
+        return `<p class="initial-message">Rất tiếc, tính năng tư vấn chuyên gia đang tạm thời gián đoạn. Vui lòng thử lại sau.</p>`;
+    }
 }
 
+/**
+ * Formats the AI-generated advice into an HTML string.
+ * @param advice The advice object from the API.
+ * @returns An HTML string.
+ */
+function formatAdviceToHtml(advice: ExpertAdvice): string {
+    const advantagesHtml = advice.advantages.length > 0
+        ? `<ul>${advice.advantages.map(item => `<li>${item}</li>`).join('')}</ul>`
+        : '<p>Không có ưu điểm đặc biệt nào được ghi nhận.</p>';
+
+    const considerationsHtml = advice.considerations.length > 0
+        ? `<ul>${advice.considerations.map(item => `<li>${item}</li>`).join('')}</ul>`
+        : '<p>Không có điểm cần cân nhắc đặc biệt.</p>';
+        
+    return `
+        <h4>Ưu điểm nổi bật</h4>
+        ${advantagesHtml}
+        <h4>Điểm cần cân nhắc</h4>
+        ${considerationsHtml}
+        <h4>Kết luận của chuyên gia</h4>
+        <p class="summary">${advice.summary}</p>
+    `;
+}
 
 function triggerSearch(query: string) {
     if (query) {
@@ -1328,7 +1420,7 @@ function handleProductDelete(productName: string) {
  * smooth scrolling based on the URL hash.
  */
 const router = () => {
-    const hash = window.location.hash || '#home';
+    const hash = window.location.hash; // Use the actual hash, don't default it here.
 
     const mainHeader = document.querySelector('header');
     const mainContent = document.querySelector('main');
@@ -1364,9 +1456,24 @@ const router = () => {
     } else {
          // Show main layout for standard anchor links
         [mainHeader, mainContent, mainFooter].forEach(el => el!.style.display = '');
+
+        // If user explicitly navigates to #home, reset the view to featured products.
+        if (hash === '#home') {
+            featuredProductsCurrentPage = 1;
+            displayFeaturedProducts(allProducts);
+
+            // Clean the URL for better UX if it had a search query.
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('q')) {
+                const newUrl = window.location.pathname + window.location.hash;
+                // Use pushState so the user can use the back button to return to their search results.
+                history.pushState({}, '', newUrl);
+            }
+        }
        
         setTimeout(() => {
-            const selector = (hash.length > 1) ? hash : '#home';
+            // Use '#home' as the default scroll target if hash is empty.
+            const selector = (hash && hash.length > 1) ? hash : '#home';
             try {
                 const targetElement = document.querySelector(selector);
                 if (targetElement) {
@@ -1490,7 +1597,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // AI Consultant Tab listener
         const generateAdviceButton = document.getElementById('generate-advice-button') as HTMLButtonElement;
         if (generateAdviceButton) {
-            generateAdviceButton.addEventListener('click', () => {
+            generateAdviceButton.addEventListener('click', async () => {
                 if (!currentModalProduct) return;
 
                 const consultantInitialMessage = document.querySelector('#tab-panel-consultant .consultant-initial-message') as HTMLElement;
@@ -1498,7 +1605,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (consultantInitialMessage) consultantInitialMessage.style.display = 'none';
                 if (consultantResultContainer) {
-                    const adviceHtml = generateExpertAdvice(currentModalProduct);
+                    consultantResultContainer.innerHTML = `<div class="loading-spinner" style="display: block;"></div>`;
+                    const adviceHtml = await generateExpertAdvice(currentModalProduct);
                     consultantResultContainer.innerHTML = adviceHtml;
                 }
             });
