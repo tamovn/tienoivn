@@ -1,35 +1,15 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 import { GoogleGenAI, Type } from "@google/genai";
+import { getProducts, getArticles, getComments, Product, Article, Comment } from './api.js';
+
 
 // --- Type Interfaces ---
-interface Product {
-  name: string;
-  description: string;
-  price: string;
-  link: string;
-  image: string;
-  type: string;
-  status: string;
-  description_detail: string;
-  button_text: string;
-}
-
-interface Article {
-  title: string;
-  description: string;
-  link: string;
-  imageURL: string;
-}
-
-interface Comment {
-  product_type: string;
-  author: string;
-  text: string;
-  date: string;
-}
+// Interfaces are now also in api.ts, but kept here for clarity in this file.
+// In a larger setup, these would be in a shared types definition file.
 
 interface ExpertAdvice {
     advantages: string[];
@@ -37,124 +17,10 @@ interface ExpertAdvice {
     summary: string;
 }
 
-// --- DATA: Embedded for 100% reliability. This is the single source of truth on page load. ---
-const PRODUCTS_DATA: Product[] = [
-  {
-    "name": "Xe Đạp Điện Theli Aima",
-    "description": "Thiết kế thời trang, động cơ mạnh mẽ, phù hợp cho việc đi lại trong thành phố.",
-    "price": "15.500.000đ",
-    "link": "https://example.com/theli-aima",
-    "image": "https://i.ibb.co/L5Bwz8M/e-bike-1.jpg",
-    "type": "Xe đạp điện",
-    "status": "Còn hàng",
-    "description_detail": "Xe Đạp Điện Theli Aima là sự kết hợp hoàn hảo giữa phong cách và hiệu suất. Với pin Lithium dung lượng cao, xe có thể đi được quãng đường lên đến 70km mỗi lần sạc. Động cơ 350W mạnh mẽ giúp bạn dễ dàng vượt qua các con dốc. Hệ thống phanh đĩa an toàn, đèn LED siêu sáng.",
-    "button_text": "Xem ngay"
-  },
-  {
-    "name": "Xe Máy Điện Vinfast Evo200",
-    "description": "Quãng đường di chuyển vượt trội, công nghệ pin LFP tiên tiến, chống nước IP67.",
-    "price": "22.000.000đ",
-    "link": "https://example.com/vinfast-evo200",
-    "image": "https://i.ibb.co/h9yVzZk/e-scooter-1.jpg",
-    "type": "Xe máy điện",
-    "status": "Còn hàng",
-    "description_detail": "Vinfast Evo200 thiết lập tiêu chuẩn mới cho xe máy điện với khả năng di chuyển lên tới 200km sau một lần sạc đầy. Động cơ in-hub và công nghệ pin LFP đảm bảo độ bền và an toàn. Xe có khả năng chống nước chuẩn IP67, yên tâm di chuyển trong mọi điều kiện thời tiết.",
-    "button_text": "Khám phá"
-  },
-  {
-    "name": "Xe Đạp Gấp G-Force C14",
-    "description": "Gọn nhẹ, dễ dàng gấp gọn trong 3 bước, phù hợp cho người hay di chuyển.",
-    "price": "8.900.000đ",
-    "link": "https://example.com/g-force-c14",
-    "image": "https://i.ibb.co/D9pXG2N/folding-bike-1.jpg",
-    "type": "Xe đạp gấp",
-    "status": "Đặt trước",
-    "description_detail": "G-Force C14 là giải pháp di chuyển linh hoạt cho đô thị. Với khung hợp kim nhôm siêu nhẹ, chiếc xe có thể được gấp gọn nhanh chóng để mang lên xe bus, tàu điện hoặc cất trong cốp ô tô. Dù nhỏ gọn, xe vẫn được trang bị bộ đề 7 tốc độ và phanh đĩa an toàn.",
-    "button_text": "Đặt hàng"
-  },
-  {
-    "name": "Pin Lithium 48V-20Ah",
-    "description": "Pin thay thế cao cấp cho xe điện, tăng quãng đường, tuổi thọ cao.",
-    "price": "4.200.000đ",
-    "link": "https://example.com/pin-lithium",
-    "image": "https://i.ibb.co/qYn0S2G/battery-1.jpg",
-    "type": "Linh kiện",
-    "status": "Còn hàng",
-    "description_detail": "Nâng cấp cho xe điện của bạn với pin Lithium 48V-20Ah. Pin sử dụng cell chất lượng cao, cho dòng xả ổn định và tuổi thọ lên đến 5 năm. Vỏ nhôm chống va đập, tích hợp mạch quản lý pin (BMS) thông minh để bảo vệ chống sạc quá mức, xả quá sâu và ngắn mạch.",
-    "button_text": "Xem chi tiết"
-  },
-    {
-    "name": "Xe Máy Điện Yadea G5",
-    "description": "Thiết kế tối giản đậm chất châu Âu, động cơ GTR 2.0 độc quyền.",
-    "price": "39.990.000đ",
-    "link": "https://example.com/yadea-g5",
-    "image": "https://i.ibb.co/wJ2cR6J/e-scooter-2.jpg",
-    "type": "Xe máy điện",
-    "status": "Hết hàng",
-    "description_detail": "Yadea G5 mang vẻ đẹp hiện đại, tinh tế. Xe được trang bị màn hình LCD 7 inch, hệ thống khóa thông minh và động cơ GTR 2.0 mạnh mẽ, tiết kiệm năng lượng. Khung xe bằng thép cán lạnh cao cấp, đảm bảo độ vững chắc và an toàn tối đa.",
-    "button_text": "Xem chi tiết"
-  }
-];
-
-const ARTICLES_DATA: Article[] = [
-  {
-    "title": "5 Lợi Ích Của Việc Sử Dụng Xe Đạp Điện",
-    "description": "Khám phá những lợi ích không ngờ về sức khỏe, tài chính và môi trường khi bạn chuyển sang sử dụng xe đạp điện hàng ngày.",
-    "link": "https://example.com/blog/loi-ich-xe-dap-dien",
-    "imageURL": "https://i.ibb.co/MfZg7fG/blog-1.jpg"
-  },
-  {
-    "title": "Hướng Dẫn Bảo Dưỡng Pin Xe Máy Điện Đúng Cách",
-    "description": "Pin là trái tim của xe điện. Tìm hiểu các mẹo bảo dưỡng đơn giản để kéo dài tuổi thọ pin và đảm bảo hiệu suất tối ưu.",
-    "link": "https://example.com/blog/bao-duong-pin",
-    "imageURL": "https://i.ibb.co/tZ5tF7X/blog-2.jpg"
-  },
-  {
-    "title": "Xe Đạp Gấp: Giải Pháp Di Chuyển Thông Minh Cho Đô Thị",
-    "description": "Tại sao xe đạp gấp lại trở thành xu hướng? Chúng ta sẽ phân tích sự tiện lợi và linh hoạt mà chúng mang lại cho cuộc sống thành thị.",
-    "link": "https://example.com/blog/xu-huong-xe-dap-gap",
-    "imageURL": "https://i.ibb.co/r2kQZ7x/blog-3.jpg"
-  }
-];
-
-const COMMENTS_DATA: Comment[] = [
-  {
-    "product_type": "Xe đạp điện",
-    "author": "Minh Anh",
-    "text": "Xe Theli Aima đi êm thật, thiết kế đẹp, bạn bè ai cũng khen. Sạc cũng nhanh đầy nữa.",
-    "date": "20/05/2024"
-  },
-  {
-    "product_type": "Xe máy điện",
-    "author": "Tuấn Khải",
-    "text": "Mua Vinfast Evo200 không hối hận. Đi làm cả tuần mới phải sạc một lần, quá tiện. Xe đi đầm và chắc chắn.",
-    "date": "18/05/2024"
-  },
-  {
-    "product_type": "Xe đạp gấp",
-    "author": "Phương Linh",
-    "text": "Mình rất thích chiếc G-Force C14. Mỗi cuối tuần mình đều bỏ nó vào cốp xe đi dã ngoại. Gấp mở rất dễ dàng.",
-    "date": "15/05/2024"
-  },
-  {
-    "product_type": "Linh kiện",
-    "author": "Bảo Nam",
-    "text": "Pin Lithium 48V-20Ah này tốt hơn hẳn ắc quy cũ của mình. Xe chạy bốc hơn và đi được xa hơn nhiều.",
-    "date": "12/05/2024"
-  },
-  {
-    "product_type": "Xe máy điện",
-    "author": "An Nhiên",
-    "text": "Tiếc là Yadea G5 đang hết hàng, mình rất thích mẫu này. Hi vọng shop sớm nhập hàng về lại.",
-    "date": "10/05/2024"
-  },
-  {
-    "product_type": "Xe đạp điện",
-    "author": "Quốc Trung",
-    "text": "Tìm mãi mới được một chiếc xe đạp điện ưng ý. Nhân viên tư vấn nhiệt tình, sẽ giới thiệu bạn bè.",
-    "date": "05/05/2024"
-  }
-];
+// --- DATA: Is now loaded dynamically. These are the variables that will hold the data. ---
+let allProducts: Product[] = [];
+let allComments: Comment[] = [];
+let allArticles: Article[] = [];
 
 
 // --- Global Constants & Variables ---
@@ -165,8 +31,6 @@ const MAX_RECENTLY_VIEWED = 5;
 const PRODUCT_CLICKS_KEY = 'thegioixedien_product_clicks';
 const MANAGED_PRODUCTS_KEY = 'thegioixedien_managed_products';
 
-let allProducts: Product[] = [];
-let allComments: Comment[] = [];
 let currentModalProduct: Product | null = null;
 const DEFAULT_PAGE_TITLE = "Tienoi.one - Khám phá Sản phẩm & Dịch vụ";
 let featuredProductsCurrentPage = 1;
@@ -1102,7 +966,7 @@ function performSearch(query: string) {
   if (loadingSpinner) loadingSpinner.style.display = 'none';
 }
 
-function initializeApp() {
+async function initializeApp() {
     // Guard clauses to ensure essential elements exist before running
     if (!loadingSpinner || !resultsContainer || !blogGrid) {
         console.error("Essential DOM elements are missing. App cannot initialize.");
@@ -1119,19 +983,21 @@ function initializeApp() {
     if (blogSpinner) blogSpinner.style.display = 'block';
 
     try {
-        // --- DATA INITIALIZATION - SIMPLIFIED FOR 100% RELIABILITY ---
-        // Always load data directly from the embedded constants. This removes all
-        // external dependencies (like localStorage reading on startup) and guarantees
-        // that the site always displays content, fixing the core issue.
-        allProducts = PRODUCTS_DATA;
-        allComments = COMMENTS_DATA;
-        const articles = ARTICLES_DATA;
+        // --- DATA INITIALIZATION - Fetch from JSON files ---
+        const [products, articles, comments] = await Promise.all([
+            getProducts(),
+            getArticles(),
+            getComments()
+        ]);
+        
+        allProducts = products;
+        allArticles = articles;
+        allComments = comments;
         
         // --- UI Population ---
-        // Populate the page with the guaranteed data.
         displaySmartSuggestions(allProducts);
-        displayBlogPosts(articles);
-        populateFooter(articles, allProducts);
+        displayBlogPosts(allArticles);
+        populateFooter(allArticles, allProducts);
         
         // --- Handle Initial Search State from URL ---
         const urlParams = new URLSearchParams(window.location.search);
