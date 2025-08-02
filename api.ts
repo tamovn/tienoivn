@@ -39,14 +39,22 @@ export interface Comment {
  * @returns A promise that resolves with the parsed JSON data.
  */
 async function fetchData<T>(url: string): Promise<T> {
+    console.log(`🔍 Fetching data from: ${url}`);
     try {
-        const response = await fetch(url, { cache: 'no-store' }); // Use 'no-store' for development to see changes
+        const response = await fetch(url, { cache: 'no-store' });
+        console.log(`📡 Response for ${url} - Status: ${response.status}`);
+
         if (!response.ok) {
+            console.error(`❌ Network response was not ok for ${url}. Status: ${response.status}, Text: ${response.statusText}`);
             throw new Error(`Network response was not ok for ${url}: ${response.statusText}`);
         }
-        return await response.json() as T;
+        
+        const data = await response.json() as T;
+        console.log(`✅ Data loaded successfully from ${url}.`);
+        return data;
+
     } catch (error) {
-        console.error(`Failed to fetch data from ${url}:`, error);
+        console.error(`❌ Failed to fetch or parse JSON from ${url}:`, error);
         // Return an empty array or object as a fallback to prevent app crashes
         return [] as T; 
     }
@@ -57,7 +65,7 @@ async function fetchData<T>(url: string): Promise<T> {
  * @returns A promise that resolves to an array of Product objects.
  */
 export const getProducts = (): Promise<Product[]> => {
-    return fetchData<Product[]>('products.json');
+    return fetchData<Product[]>('/products.json');
 }
 
 /**
@@ -65,7 +73,7 @@ export const getProducts = (): Promise<Product[]> => {
  * @returns A promise that resolves to an array of Article objects.
  */
 export const getArticles = (): Promise<Article[]> => {
-    return fetchData<Article[]>('articles.json');
+    return fetchData<Article[]>('/articles.json');
 }
 
 /**
@@ -73,5 +81,5 @@ export const getArticles = (): Promise<Article[]> => {
  * @returns A promise that resolves to an array of Comment objects.
  */
 export const getComments = (): Promise<Comment[]> => {
-    return fetchData<Comment[]>('comments.json');
+    return fetchData<Comment[]>('/comments.json');
 }
