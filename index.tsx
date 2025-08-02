@@ -862,8 +862,16 @@ function displayBlogPosts(articles: Article[]) {
  * @returns A string containing the formatted HTML advice or an error message.
  */
 async function generateExpertAdvice(product: Product): Promise<string> {
+    // Proactively check for API key to handle common client-side environment issues.
+    // This provides a better developer and user experience when the environment is not
+    // configured correctly with a build tool.
+    if (!process.env.API_KEY) {
+        console.error("Lỗi cấu hình: Biến môi trường API_KEY chưa được thiết lập. Đây là một bước bắt buộc trong quá trình build. Vui lòng xem lại hướng dẫn về cách inject biến môi trường.");
+        return `<p class="initial-message">Lỗi cấu hình: Tính năng tư vấn chuyên gia tạm thời không khả dụng. Vui lòng liên hệ quản trị viên.</p>`;
+    }
+
     try {
-        // Initialize AI client just-in-time to prevent app crash if API_KEY is missing.
+        // Initialize AI client just-in-time.
         const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
 
         const response = await ai.models.generateContent({
@@ -907,8 +915,7 @@ async function generateExpertAdvice(product: Product): Promise<string> {
 
     } catch (error) {
         console.error("Gemini API call for advice failed:", error);
-        // This catch block handles both API key errors and other API failures,
-        // returning a user-facing error message directly.
+        // This catch block handles API failures beyond the initial key check.
         return `<p class="initial-message">Rất tiếc, tính năng tư vấn chuyên gia đang tạm thời gián đoạn. Vui lòng thử lại sau.</p>`;
     }
 }
