@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -38,7 +39,6 @@ let featuredProductsCurrentPage = 1;
 // --- DOM Element Selection ---
 // Main Page
 const resultsContainer = document.getElementById('results') as HTMLElement;
-const loadingSpinner = document.getElementById('loading-spinner') as HTMLElement;
 const blogGrid = document.getElementById('blog-grid') as HTMLElement;
 const recentlyViewedSection = document.getElementById('recently-viewed-section') as HTMLElement;
 const recentlyViewedContainer = document.getElementById('recently-viewed-container') as HTMLElement;
@@ -497,7 +497,51 @@ function closeProductModal() {
     updatePageTitle(); // Reset title to default
 }
 
-// --- Display Functions ---
+// --- Display & Skeleton Functions ---
+/**
+ * Creates an HTML string for a single skeleton loader card.
+ * @returns {string} The HTML string for the skeleton card.
+ */
+function createSkeletonCardHTML(): string {
+    return `
+        <div class="skeleton-card">
+            <div class="skeleton-element skeleton-image"></div>
+            <div class="skeleton-content">
+                <div class="skeleton-element skeleton-text"></div>
+                <div class="skeleton-element skeleton-text short"></div>
+                <div class="skeleton-element skeleton-text" style="margin-top: 1rem;"></div>
+                <div class="skeleton-element skeleton-text"></div>
+                <div class="skeleton-footer">
+                    <div class="skeleton-element skeleton-price"></div>
+                    <div class="skeleton-element skeleton-button"></div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Renders a specified number of skeleton loaders into a container.
+ * @param {HTMLElement} container - The container to render skeletons into.
+ * @param {number} count - The number of skeletons to render.
+ */
+function renderSkeletons(container: HTMLElement, count: number) {
+    if (!container) return;
+    
+    const grid = document.createElement('div');
+    // Use the same class as the real content for consistent layout
+    grid.className = container.id === 'results' ? 'product-grid-inner' : 'article-grid';
+    
+    let skeletonsHTML = '';
+    for (let i = 0; i < count; i++) {
+        skeletonsHTML += createSkeletonCardHTML();
+    }
+    grid.innerHTML = skeletonsHTML;
+
+    container.innerHTML = ''; // Clear previous content
+    container.appendChild(grid);
+}
+
 function createProductCard(product: Product): HTMLElement {
   const productCard = document.createElement('div');
   productCard.className = 'product-card';
@@ -647,7 +691,10 @@ function displayProducts(products: Product[], preambleHtml: string = '') {
 
 function displayFeaturedProducts(products: Product[]) {
     if (!resultsContainer) return;
-    if (!products || products.length === 0) return;
+    if (!products || products.length === 0) {
+        resultsContainer.innerHTML = '<h2>Sản phẩm nổi bật</h2><p class="initial-message">Hiện chưa có sản phẩm nào để hiển thị.</p>';
+        return;
+    }
 
     // Get all clicks and sort products by popularity
     let allClicks = {};
@@ -785,9 +832,6 @@ function displaySmartSuggestions(products: Product[]) {
 
 function displayBlogPosts(articles: Article[]) {
   if (!blogGrid) return;
-  const spinner = document.getElementById('loading-spinner-blog');
-
-  if (spinner) spinner.style.display = 'none';
   
   if (!articles || articles.length === 0) {
     blogGrid.innerHTML = '<p class="initial-message">Hiện chưa có bài viết nào.</p>';
@@ -921,11 +965,7 @@ function performSearch(query: string) {
     console.warn("Could not update URL history.", error);
   }
 
-  if (loadingSpinner) loadingSpinner.style.display = 'block';
-  if (resultsContainer) resultsContainer.innerHTML = '';
-  
   if (!trimmedQuery) {
-    if (loadingSpinner) loadingSpinner.style.display = 'none';
     featuredProductsCurrentPage = 1; // Reset page on new search
     displayFeaturedProducts(allProducts); // Show featured instead of empty message
     return;
@@ -961,8 +1001,6 @@ function performSearch(query: string) {
           displayProducts([], message);
       }
   }
-
-  if (loadingSpinner) loadingSpinner.style.display = 'none';
 }
 
 /**
@@ -991,9 +1029,13 @@ async function loadInitialProducts(): Promise<Product[]> {
     return getProducts();
 }
 
+/**
+ * Initializes the application with a progressive loading strategy.
+ * It loads and displays critical content (products) first,
+ * then loads non-critical content (articles, comments) in the background.
+ */
 async function initializeApp() {
-    // Guard clauses to ensure essential elements exist before running
-    if (!loadingSpinner || !resultsContainer || !blogGrid) {
+    if (!resultsContainer || !blogGrid) {
         console.error("Essential DOM elements are missing. App cannot initialize.");
         return;
     }
@@ -1002,47 +1044,44 @@ async function initializeApp() {
     updatePageTitle();
     displayRecentSearches();
     displayRecentlyViewed();
-    loadingSpinner.style.display = 'block';
-    resultsContainer.innerHTML = '';
-    const blogSpinner = document.getElementById('loading-spinner-blog');
-    if (blogSpinner) blogSpinner.style.display = 'block';
+    
+    // Render skeleton loaders immediately for better perceived performance
+    renderSkeletons(resultsContainer, 6);
+    renderSkeletons(blogGrid, 3);
 
     try {
-        // --- DATA INITIALIZATION - Fetch from JSON files ---
-        const [products, articles, comments] = await Promise.all([
-            loadInitialProducts(), // Use the new function to load products
-            getArticles(),
-            getComments()
-        ]);
-        
+        // --- Stage 1: Load and render CRITICAL content (Products) ---
+        const products = await loadInitialProducts();
         allProducts = products;
-        allArticles = articles;
-        allComments = comments;
         
-        // --- UI Population ---
+        // Populate UI with product data as soon as it's available
         displaySmartSuggestions(allProducts);
-        displayBlogPosts(allArticles);
-        populateFooter(allArticles, allProducts);
         
-        // --- Handle Initial Search State from URL ---
         const urlParams = new URLSearchParams(window.location.search);
         const query = urlParams.get('q');
         if (query) {
             triggerSearch(query);
         } else {
-             // On a fresh load, show the featured products.
              featuredProductsCurrentPage = 1;
              displayFeaturedProducts(allProducts);
         }
+
+        // --- Stage 2: Load NON-CRITICAL content in the background ---
+        // We don't `await` these. They will populate when ready.
+        getArticles().then(articles => {
+            allArticles = articles;
+            displayBlogPosts(allArticles);
+            populateFooter(allArticles, allProducts); // Repopulate footer with all data
+        });
+
+        getComments().then(comments => {
+            allComments = comments;
+        });
+
     } catch (error) {
-        console.error('Error during app initialization:', error);
+        console.error('Error during critical app initialization:', error);
         resultsContainer.innerHTML = '<h2>Đã có lỗi xảy ra</h2><p class="initial-message">Không thể tải dữ liệu sản phẩm. Vui lòng thử lại sau.</p>';
         blogGrid.innerHTML = '<p class="initial-message">Không thể tải các bài viết. Vui lòng thử lại sau.</p>';
-    } finally {
-        // --- Final UI State ---
-        // Ensure all loading spinners are hidden, even if an error occurred.
-        if (loadingSpinner) loadingSpinner.style.display = 'none';
-        if (blogSpinner) blogSpinner.style.display = 'none';
     }
 }
 

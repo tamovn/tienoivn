@@ -1,3 +1,4 @@
+
 :root {
   --background-color: #0a041a; /* Deep space blue/purple */
   --text-color: #e0e0e0;
@@ -7,6 +8,8 @@
   --card-border-color: rgba(0, 191, 255, 0.25);
   --glass-blur: blur(10px);
   --font-family: 'Poppins', sans-serif;
+  --skeleton-base-color: rgba(255, 255, 255, 0.05);
+  --skeleton-shine-color: rgba(255, 255, 255, 0.1);
 }
 
 * {
@@ -219,8 +222,7 @@ main {
   margin: 0 auto;
 }
 
-.loading-spinner,
-#loading-spinner {
+.loading-spinner {
   border: 4px solid rgba(0, 191, 255, 0.2);
   border-top: 4px solid var(--primary-color);
   border-radius: 50%;
@@ -1802,6 +1804,75 @@ footer {
     font-weight: 600;
     color: var(--text-color);
     font-size: 0.9rem;
+}
+
+/* --- Skeleton Loader --- */
+.skeleton-card {
+  background: var(--card-background);
+  border: 1px solid var(--card-border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-element {
+  background: var(--skeleton-base-color);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-element::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 150%;
+  height: 100%;
+  background: linear-gradient(to right, transparent 0%, var(--skeleton-shine-color) 50%, transparent 100%);
+  animation: skeleton-shine 1.5s infinite linear;
+}
+
+@keyframes skeleton-shine {
+  0% { left: -150%; }
+  100% { left: 150%; }
+}
+
+.skeleton-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.skeleton-content {
+  padding: 1.5rem;
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-text.short {
+  width: 60%;
+}
+
+.skeleton-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skeleton-price {
+  width: 30%;
+  height: 1.5em;
+}
+
+.skeleton-button {
+  width: 40%;
+  height: 2.5em;
+  border-radius: 6px;
 }
 
 
