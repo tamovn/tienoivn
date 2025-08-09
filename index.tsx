@@ -1,15 +1,35 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 import { GoogleGenAI, Type } from "@google/genai";
-import { getProducts, getArticles, getComments, Product, Article, Comment } from './api.js';
-
 
 // --- Type Interfaces ---
-// Interfaces are now also in api.ts, but kept here for clarity in this file.
-// In a larger setup, these would be in a shared types definition file.
+interface Product {
+  name: string;
+  description: string;
+  price: string;
+  link: string;
+  image: string;
+  type: string;
+  status: string;
+  description_detail: string;
+  button_text: string;
+}
+
+interface Article {
+  title: string;
+  description: string;
+  link: string;
+  imageURL: string;
+}
+
+interface Comment {
+  product_type: string;
+  author: string;
+  text: string;
+  date: string;
+}
 
 interface ExpertAdvice {
     advantages: string[];
@@ -17,10 +37,124 @@ interface ExpertAdvice {
     summary: string;
 }
 
-// --- DATA: Is now loaded dynamically. These are the variables that will hold the data. ---
-let allProducts: Product[] = [];
-let allComments: Comment[] = [];
-let allArticles: Article[] = [];
+// --- DATA: Embedded for 100% reliability. This is the single source of truth on page load. ---
+const PRODUCTS_DATA: Product[] = [
+  {
+    "name": "Xe Đạp Điện Theli Aima",
+    "description": "Thiết kế thời trang, động cơ mạnh mẽ, phù hợp cho việc đi lại trong thành phố.",
+    "price": "15.500.000đ",
+    "link": "https://example.com/theli-aima",
+    "image": "https://i.ibb.co/L5Bwz8M/e-bike-1.jpg",
+    "type": "Xe đạp điện",
+    "status": "Còn hàng",
+    "description_detail": "Xe Đạp Điện Theli Aima là sự kết hợp hoàn hảo giữa phong cách và hiệu suất. Với pin Lithium dung lượng cao, xe có thể đi được quãng đường lên đến 70km mỗi lần sạc. Động cơ 350W mạnh mẽ giúp bạn dễ dàng vượt qua các con dốc. Hệ thống phanh đĩa an toàn, đèn LED siêu sáng.",
+    "button_text": "Xem ngay"
+  },
+  {
+    "name": "Xe Máy Điện Vinfast Evo200",
+    "description": "Quãng đường di chuyển vượt trội, công nghệ pin LFP tiên tiến, chống nước IP67.",
+    "price": "22.000.000đ",
+    "link": "https://example.com/vinfast-evo200",
+    "image": "https://i.ibb.co/h9yVzZk/e-scooter-1.jpg",
+    "type": "Xe máy điện",
+    "status": "Còn hàng",
+    "description_detail": "Vinfast Evo200 thiết lập tiêu chuẩn mới cho xe máy điện với khả năng di chuyển lên tới 200km sau một lần sạc đầy. Động cơ in-hub và công nghệ pin LFP đảm bảo độ bền và an toàn. Xe có khả năng chống nước chuẩn IP67, yên tâm di chuyển trong mọi điều kiện thời tiết.",
+    "button_text": "Khám phá"
+  },
+  {
+    "name": "Xe Đạp Gấp G-Force C14",
+    "description": "Gọn nhẹ, dễ dàng gấp gọn trong 3 bước, phù hợp cho người hay di chuyển.",
+    "price": "8.900.000đ",
+    "link": "https://example.com/g-force-c14",
+    "image": "https://i.ibb.co/D9pXG2N/folding-bike-1.jpg",
+    "type": "Xe đạp gấp",
+    "status": "Đặt trước",
+    "description_detail": "G-Force C14 là giải pháp di chuyển linh hoạt cho đô thị. Với khung hợp kim nhôm siêu nhẹ, chiếc xe có thể được gấp gọn nhanh chóng để mang lên xe bus, tàu điện hoặc cất trong cốp ô tô. Dù nhỏ gọn, xe vẫn được trang bị bộ đề 7 tốc độ và phanh đĩa an toàn.",
+    "button_text": "Đặt hàng"
+  },
+  {
+    "name": "Pin Lithium 48V-20Ah",
+    "description": "Pin thay thế cao cấp cho xe điện, tăng quãng đường, tuổi thọ cao.",
+    "price": "4.200.000đ",
+    "link": "https://example.com/pin-lithium",
+    "image": "https://i.ibb.co/qYn0S2G/battery-1.jpg",
+    "type": "Linh kiện",
+    "status": "Còn hàng",
+    "description_detail": "Nâng cấp cho xe điện của bạn với pin Lithium 48V-20Ah. Pin sử dụng cell chất lượng cao, cho dòng xả ổn định và tuổi thọ lên đến 5 năm. Vỏ nhôm chống va đập, tích hợp mạch quản lý pin (BMS) thông minh để bảo vệ chống sạc quá mức, xả quá sâu và ngắn mạch.",
+    "button_text": "Xem chi tiết"
+  },
+    {
+    "name": "Xe Máy Điện Yadea G5",
+    "description": "Thiết kế tối giản đậm chất châu Âu, động cơ GTR 2.0 độc quyền.",
+    "price": "39.990.000đ",
+    "link": "https://example.com/yadea-g5",
+    "image": "https://i.ibb.co/wJ2cR6J/e-scooter-2.jpg",
+    "type": "Xe máy điện",
+    "status": "Hết hàng",
+    "description_detail": "Yadea G5 mang vẻ đẹp hiện đại, tinh tế. Xe được trang bị màn hình LCD 7 inch, hệ thống khóa thông minh và động cơ GTR 2.0 mạnh mẽ, tiết kiệm năng lượng. Khung xe bằng thép cán lạnh cao cấp, đảm bảo độ vững chắc và an toàn tối đa.",
+    "button_text": "Xem chi tiết"
+  }
+];
+
+const ARTICLES_DATA: Article[] = [
+  {
+    "title": "5 Lợi Ích Của Việc Sử Dụng Xe Đạp Điện",
+    "description": "Khám phá những lợi ích không ngờ về sức khỏe, tài chính và môi trường khi bạn chuyển sang sử dụng xe đạp điện hàng ngày.",
+    "link": "https://example.com/blog/loi-ich-xe-dap-dien",
+    "imageURL": "https://i.ibb.co/MfZg7fG/blog-1.jpg"
+  },
+  {
+    "title": "Hướng Dẫn Bảo Dưỡng Pin Xe Máy Điện Đúng Cách",
+    "description": "Pin là trái tim của xe điện. Tìm hiểu các mẹo bảo dưỡng đơn giản để kéo dài tuổi thọ pin và đảm bảo hiệu suất tối ưu.",
+    "link": "https://example.com/blog/bao-duong-pin",
+    "imageURL": "https://i.ibb.co/tZ5tF7X/blog-2.jpg"
+  },
+  {
+    "title": "Xe Đạp Gấp: Giải Pháp Di Chuyển Thông Minh Cho Đô Thị",
+    "description": "Tại sao xe đạp gấp lại trở thành xu hướng? Chúng ta sẽ phân tích sự tiện lợi và linh hoạt mà chúng mang lại cho cuộc sống thành thị.",
+    "link": "https://example.com/blog/xu-huong-xe-dap-gap",
+    "imageURL": "https://i.ibb.co/r2kQZ7x/blog-3.jpg"
+  }
+];
+
+const COMMENTS_DATA: Comment[] = [
+  {
+    "product_type": "Xe đạp điện",
+    "author": "Minh Anh",
+    "text": "Xe Theli Aima đi êm thật, thiết kế đẹp, bạn bè ai cũng khen. Sạc cũng nhanh đầy nữa.",
+    "date": "20/05/2024"
+  },
+  {
+    "product_type": "Xe máy điện",
+    "author": "Tuấn Khải",
+    "text": "Mua Vinfast Evo200 không hối hận. Đi làm cả tuần mới phải sạc một lần, quá tiện. Xe đi đầm và chắc chắn.",
+    "date": "18/05/2024"
+  },
+  {
+    "product_type": "Xe đạp gấp",
+    "author": "Phương Linh",
+    "text": "Mình rất thích chiếc G-Force C14. Mỗi cuối tuần mình đều bỏ nó vào cốp xe đi dã ngoại. Gấp mở rất dễ dàng.",
+    "date": "15/05/2024"
+  },
+  {
+    "product_type": "Linh kiện",
+    "author": "Bảo Nam",
+    "text": "Pin Lithium 48V-20Ah này tốt hơn hẳn ắc quy cũ của mình. Xe chạy bốc hơn và đi được xa hơn nhiều.",
+    "date": "12/05/2024"
+  },
+  {
+    "product_type": "Xe máy điện",
+    "author": "An Nhiên",
+    "text": "Tiếc là Yadea G5 đang hết hàng, mình rất thích mẫu này. Hi vọng shop sớm nhập hàng về lại.",
+    "date": "10/05/2024"
+  },
+  {
+    "product_type": "Xe đạp điện",
+    "author": "Quốc Trung",
+    "text": "Tìm mãi mới được một chiếc xe đạp điện ưng ý. Nhân viên tư vấn nhiệt tình, sẽ giới thiệu bạn bè.",
+    "date": "05/05/2024"
+  }
+];
 
 
 // --- Global Constants & Variables ---
@@ -31,6 +165,8 @@ const MAX_RECENTLY_VIEWED = 5;
 const PRODUCT_CLICKS_KEY = 'thegioixedien_product_clicks';
 const MANAGED_PRODUCTS_KEY = 'thegioixedien_managed_products';
 
+let allProducts: Product[] = [];
+let allComments: Comment[] = [];
 let currentModalProduct: Product | null = null;
 const DEFAULT_PAGE_TITLE = "Tienoi.one - Khám phá Sản phẩm & Dịch vụ";
 let featuredProductsCurrentPage = 1;
@@ -39,6 +175,7 @@ let featuredProductsCurrentPage = 1;
 // --- DOM Element Selection ---
 // Main Page
 const resultsContainer = document.getElementById('results') as HTMLElement;
+const loadingSpinner = document.getElementById('loading-spinner') as HTMLElement;
 const blogGrid = document.getElementById('blog-grid') as HTMLElement;
 const recentlyViewedSection = document.getElementById('recently-viewed-section') as HTMLElement;
 const recentlyViewedContainer = document.getElementById('recently-viewed-container') as HTMLElement;
@@ -182,14 +319,8 @@ function initNavSwipe() {
 
 // --- Recently Searched Functions ---
 function getRecentSearches(): string[] {
-  try {
-    const searches = localStorage.getItem(RECENT_SEARCHES_KEY);
-    return searches ? JSON.parse(searches) : [];
-  } catch (e) {
-    console.warn("Could not parse recent searches from localStorage.", e);
-    localStorage.removeItem(RECENT_SEARCHES_KEY);
-    return [];
-  }
+  const searches = localStorage.getItem(RECENT_SEARCHES_KEY);
+  return searches ? JSON.parse(searches) : [];
 }
 
 function saveRecentSearch(query: string) {
@@ -227,14 +358,8 @@ function displayRecentSearches() {
 
 // --- Recently Viewed Functions ---
 function getRecentlyViewed(): Product[] {
-  try {
-    const items = localStorage.getItem(RECENTLY_VIEWED_KEY);
-    return items ? JSON.parse(items) : [];
-  } catch (e) {
-    console.warn("Could not parse recently viewed items from localStorage.", e);
-    localStorage.removeItem(RECENTLY_VIEWED_KEY);
-    return [];
-  }
+  const items = localStorage.getItem(RECENTLY_VIEWED_KEY);
+  return items ? JSON.parse(items) : [];
 }
 
 function saveToRecentlyViewed(product: Product) {
@@ -497,51 +622,7 @@ function closeProductModal() {
     updatePageTitle(); // Reset title to default
 }
 
-// --- Display & Skeleton Functions ---
-/**
- * Creates an HTML string for a single skeleton loader card.
- * @returns {string} The HTML string for the skeleton card.
- */
-function createSkeletonCardHTML(): string {
-    return `
-        <div class="skeleton-card">
-            <div class="skeleton-element skeleton-image"></div>
-            <div class="skeleton-content">
-                <div class="skeleton-element skeleton-text"></div>
-                <div class="skeleton-element skeleton-text short"></div>
-                <div class="skeleton-element skeleton-text" style="margin-top: 1rem;"></div>
-                <div class="skeleton-element skeleton-text"></div>
-                <div class="skeleton-footer">
-                    <div class="skeleton-element skeleton-price"></div>
-                    <div class="skeleton-element skeleton-button"></div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-/**
- * Renders a specified number of skeleton loaders into a container.
- * @param {HTMLElement} container - The container to render skeletons into.
- * @param {number} count - The number of skeletons to render.
- */
-function renderSkeletons(container: HTMLElement, count: number) {
-    if (!container) return;
-    
-    const grid = document.createElement('div');
-    // Use the same class as the real content for consistent layout
-    grid.className = container.id === 'results' ? 'product-grid-inner' : 'article-grid';
-    
-    let skeletonsHTML = '';
-    for (let i = 0; i < count; i++) {
-        skeletonsHTML += createSkeletonCardHTML();
-    }
-    grid.innerHTML = skeletonsHTML;
-
-    container.innerHTML = ''; // Clear previous content
-    container.appendChild(grid);
-}
-
+// --- Display Functions ---
 function createProductCard(product: Product): HTMLElement {
   const productCard = document.createElement('div');
   productCard.className = 'product-card';
@@ -691,28 +772,15 @@ function displayProducts(products: Product[], preambleHtml: string = '') {
 
 function displayFeaturedProducts(products: Product[]) {
     if (!resultsContainer) return;
-    if (!products || products.length === 0) {
-        resultsContainer.innerHTML = '<h2>Sản phẩm nổi bật</h2><p class="initial-message">Hiện chưa có sản phẩm nào để hiển thị.</p>';
-        return;
-    }
+    if (!products || products.length === 0) return;
 
     // Get all clicks and sort products by popularity
-    let allClicks = {};
-    try {
-        const clicksStr = localStorage.getItem(PRODUCT_CLICKS_KEY);
-        if (clicksStr) {
-            allClicks = JSON.parse(clicksStr);
-        }
-    } catch (e) {
-        console.warn("Could not parse product clicks from localStorage.", e);
-        localStorage.removeItem(PRODUCT_CLICKS_KEY); // Clear corrupted data
-        allClicks = {};
-    }
-
+    const clicksStr = localStorage.getItem(PRODUCT_CLICKS_KEY);
+    const allClicks = clicksStr ? JSON.parse(clicksStr) : {};
 
     const productsWithClicks = products.map(p => ({
         ...p,
-        clicks: (allClicks as any)[p.name] || 0
+        clicks: allClicks[p.name] || 0
     }));
 
     productsWithClicks.sort((a, b) => b.clicks - a.clicks);
@@ -832,6 +900,9 @@ function displaySmartSuggestions(products: Product[]) {
 
 function displayBlogPosts(articles: Article[]) {
   if (!blogGrid) return;
+  const spinner = document.getElementById('loading-spinner-blog');
+
+  if (spinner) spinner.style.display = 'none';
   
   if (!articles || articles.length === 0) {
     blogGrid.innerHTML = '<p class="initial-message">Hiện chưa có bài viết nào.</p>';
@@ -862,16 +933,8 @@ function displayBlogPosts(articles: Article[]) {
  * @returns A string containing the formatted HTML advice or an error message.
  */
 async function generateExpertAdvice(product: Product): Promise<string> {
-    // Proactively check for API key to handle common client-side environment issues.
-    // This provides a better developer and user experience when the environment is not
-    // configured correctly with a build tool.
-    if (!process.env.API_KEY) {
-        console.error("Lỗi cấu hình: Biến môi trường API_KEY chưa được thiết lập. Đây là một bước bắt buộc trong quá trình build. Vui lòng xem lại hướng dẫn về cách inject biến môi trường.");
-        return `<p class="initial-message">Lỗi cấu hình: Tính năng tư vấn chuyên gia tạm thời không khả dụng. Vui lòng liên hệ quản trị viên.</p>`;
-    }
-
     try {
-        // Initialize AI client just-in-time.
+        // Initialize AI client just-in-time to prevent app crash if API_KEY is missing.
         const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
 
         const response = await ai.models.generateContent({
@@ -915,7 +978,8 @@ async function generateExpertAdvice(product: Product): Promise<string> {
 
     } catch (error) {
         console.error("Gemini API call for advice failed:", error);
-        // This catch block handles API failures beyond the initial key check.
+        // This catch block handles both API key errors and other API failures,
+        // returning a user-facing error message directly.
         return `<p class="initial-message">Rất tiếc, tính năng tư vấn chuyên gia đang tạm thời gián đoạn. Vui lòng thử lại sau.</p>`;
     }
 }
@@ -972,7 +1036,11 @@ function performSearch(query: string) {
     console.warn("Could not update URL history.", error);
   }
 
+  if (loadingSpinner) loadingSpinner.style.display = 'block';
+  if (resultsContainer) resultsContainer.innerHTML = '';
+  
   if (!trimmedQuery) {
+    if (loadingSpinner) loadingSpinner.style.display = 'none';
     featuredProductsCurrentPage = 1; // Reset page on new search
     displayFeaturedProducts(allProducts); // Show featured instead of empty message
     return;
@@ -1008,41 +1076,13 @@ function performSearch(query: string) {
           displayProducts([], message);
       }
   }
+
+  if (loadingSpinner) loadingSpinner.style.display = 'none';
 }
 
-/**
- * Loads initial products, prioritizing managed products from localStorage
- * over the default JSON file. This ensures admin changes are persistent.
- * @returns A promise that resolves to an array of Product objects.
- */
-async function loadInitialProducts(): Promise<Product[]> {
-    try {
-        const managedProductsStr = localStorage.getItem(MANAGED_PRODUCTS_KEY);
-        if (managedProductsStr) {
-            const managedProducts = JSON.parse(managedProductsStr);
-            if (Array.isArray(managedProducts) && managedProducts.length > 0) {
-                console.log("Loaded products from localStorage (Admin).");
-                return managedProducts;
-            }
-        }
-    } catch (e) {
-        console.warn("Could not parse managed products from localStorage.", e);
-        // Clear corrupted data
-        localStorage.removeItem(MANAGED_PRODUCTS_KEY);
-    }
-    
-    // Fallback to fetching from JSON if localStorage is empty or corrupted
-    console.log("Fetching default products from products.json.");
-    return getProducts();
-}
-
-/**
- * Initializes the application with a progressive loading strategy.
- * It loads and displays critical content (products) first,
- * then loads non-critical content (articles, comments) in the background.
- */
-async function initializeApp() {
-    if (!resultsContainer || !blogGrid) {
+function initializeApp() {
+    // Guard clauses to ensure essential elements exist before running
+    if (!loadingSpinner || !resultsContainer || !blogGrid) {
         console.error("Essential DOM elements are missing. App cannot initialize.");
         return;
     }
@@ -1051,44 +1091,45 @@ async function initializeApp() {
     updatePageTitle();
     displayRecentSearches();
     displayRecentlyViewed();
-    
-    // Render skeleton loaders immediately for better perceived performance
-    renderSkeletons(resultsContainer, 6);
-    renderSkeletons(blogGrid, 3);
+    loadingSpinner.style.display = 'block';
+    resultsContainer.innerHTML = '';
+    const blogSpinner = document.getElementById('loading-spinner-blog');
+    if (blogSpinner) blogSpinner.style.display = 'block';
 
     try {
-        // --- Stage 1: Load and render CRITICAL content (Products) ---
-        const products = await loadInitialProducts();
-        allProducts = products;
+        // --- DATA INITIALIZATION - SIMPLIFIED FOR 100% RELIABILITY ---
+        // Always load data directly from the embedded constants. This removes all
+        // external dependencies (like localStorage reading on startup) and guarantees
+        // that the site always displays content, fixing the core issue.
+        allProducts = PRODUCTS_DATA;
+        allComments = COMMENTS_DATA;
+        const articles = ARTICLES_DATA;
         
-        // Populate UI with product data as soon as it's available
+        // --- UI Population ---
+        // Populate the page with the guaranteed data.
         displaySmartSuggestions(allProducts);
+        displayBlogPosts(articles);
+        populateFooter(articles, allProducts);
         
+        // --- Handle Initial Search State from URL ---
         const urlParams = new URLSearchParams(window.location.search);
         const query = urlParams.get('q');
         if (query) {
             triggerSearch(query);
         } else {
+             // On a fresh load, show the featured products.
              featuredProductsCurrentPage = 1;
              displayFeaturedProducts(allProducts);
         }
-
-        // --- Stage 2: Load NON-CRITICAL content in the background ---
-        // We don't `await` these. They will populate when ready.
-        getArticles().then(articles => {
-            allArticles = articles;
-            displayBlogPosts(allArticles);
-            populateFooter(allArticles, allProducts); // Repopulate footer with all data
-        });
-
-        getComments().then(comments => {
-            allComments = comments;
-        });
-
     } catch (error) {
-        console.error('Error during critical app initialization:', error);
+        console.error('Error during app initialization:', error);
         resultsContainer.innerHTML = '<h2>Đã có lỗi xảy ra</h2><p class="initial-message">Không thể tải dữ liệu sản phẩm. Vui lòng thử lại sau.</p>';
         blogGrid.innerHTML = '<p class="initial-message">Không thể tải các bài viết. Vui lòng thử lại sau.</p>';
+    } finally {
+        // --- Final UI State ---
+        // Ensure all loading spinners are hidden, even if an error occurred.
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+        if (blogSpinner) blogSpinner.style.display = 'none';
     }
 }
 
@@ -1357,7 +1398,7 @@ function handleProductDelete(productName: string) {
  * smooth scrolling based on the URL hash.
  */
 const router = () => {
-    const hash = window.location.hash; // Use the actual hash, don't default it here.
+    const hash = window.location.hash || '#home';
 
     const mainHeader = document.querySelector('header');
     const mainContent = document.querySelector('main');
@@ -1393,24 +1434,9 @@ const router = () => {
     } else {
          // Show main layout for standard anchor links
         [mainHeader, mainContent, mainFooter].forEach(el => el!.style.display = '');
-
-        // If user explicitly navigates to #home, reset the view to featured products.
-        if (hash === '#home') {
-            featuredProductsCurrentPage = 1;
-            displayFeaturedProducts(allProducts);
-
-            // Clean the URL for better UX if it had a search query.
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('q')) {
-                const newUrl = window.location.pathname + window.location.hash;
-                // Use pushState so the user can use the back button to return to their search results.
-                history.pushState({}, '', newUrl);
-            }
-        }
        
         setTimeout(() => {
-            // Use '#home' as the default scroll target if hash is empty.
-            const selector = (hash && hash.length > 1) ? hash : '#home';
+            const selector = (hash.length > 1) ? hash : '#home';
             try {
                 const targetElement = document.querySelector(selector);
                 if (targetElement) {

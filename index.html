@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="vi">
   <head>
@@ -13,16 +12,14 @@
     <script type="importmap">
       {
         "imports": {
-          "@google/genai": "https://esm.sh/@google/genai@^0.14.0",
-          "./api.js": "./api.js"
+          "@google/genai": "https://esm.sh/@google/genai@^0.14.0"
         }
       }
     </script>
-    <script type="module" src="index.js"></script>
-  </head>
+    <script type="module" src="index.tsx"></script>
+  <link rel="stylesheet" href="/index.css">
+</head>
   <body>
-    <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
     <header id="home">
         <canvas id="particle-canvas"></canvas>
         <nav>
@@ -53,6 +50,8 @@
     </header>
 
     <main>
+        <div id="loading-spinner" style="display: none;"></div>
+
         <section id="search-section">
             <div class="search-section-wrapper">
                 <h2>Bắt Đầu Khám Phá</h2>
@@ -82,7 +81,7 @@
         </section>
 
         <section id="results" class="product-grid" aria-live="polite">
-            <!-- Products or skeletons will be loaded here by JavaScript -->
+            <!-- Products will be loaded here by JavaScript -->
         </section>
       
         <section id="recently-viewed-section" class="recently-viewed" style="display: none;">
@@ -120,7 +119,8 @@
         <section id="blog" class="content-section">
             <h2>Blog</h2>
             <div id="blog-grid" class="article-grid">
-                <!-- Blog posts or skeletons will be loaded here by JavaScript -->
+                <!-- Blog posts will be loaded here by JavaScript -->
+                <div id="loading-spinner-blog" class="loading-spinner"></div>
             </div>
         </section>
 
@@ -409,5 +409,6 @@
         </div>
       </div>
     </div>
-  </body>
+  <script type="module" src="/index.tsx"></script>
+</body>
 </html>
