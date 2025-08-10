@@ -1,2 +1,7 @@
 /*.js
   Content-Type: application/javascript
+
+
+  # Quy tắc khác
+/assets/*.js
+  Content-Type: application/javascript
