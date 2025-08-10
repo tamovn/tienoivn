@@ -1107,7 +1107,7 @@ function initializeApp() {
         
         // --- UI Population ---
         // Populate the page with the guaranteed data.
-        // displaySmartSuggestions(allProducts);
+        displaySmartSuggestions(allProducts);
         displayBlogPosts(articles);
         populateFooter(articles, allProducts);
         
