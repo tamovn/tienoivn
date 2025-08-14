@@ -1,7 +1,9 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const { GoogleGenAI, Type } = require('@google/genai');
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import { GoogleGenAI, Type } from '@google/genai';
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,13 +11,15 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Kiểm tra API key
 if (!process.env.API_KEY) {
-  console.error("LỖI: Chưa thiết lập API_KEY trong file .env");
+  console.error("❌ LỖI: Chưa thiết lập API_KEY trong file .env");
   process.exit(1);
 }
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
+// Endpoint tư vấn sản phẩm
 app.post('/api/generate-advice', async (req, res) => {
   try {
     const { product } = req.body;
@@ -25,7 +29,7 @@ app.post('/api/generate-advice', async (req, res) => {
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: `Act as an impartial expert product consultant...`,
+      contents: `Act as an impartial expert product consultant. Provide advice about: ${product}`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -40,11 +44,15 @@ app.post('/api/generate-advice', async (req, res) => {
       },
     });
 
-    const output = response.output_text || response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const output =
+      response.output_text ||
+      response.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "";
+
     res.json({ advice: output });
 
   } catch (error) {
-    console.error("Lỗi khi gọi Gemini API:", error);
+    console.error("❌ Lỗi khi gọi Gemini API:", error);
     res.status(500).json({ error: 'Lỗi máy chủ khi tạo tư vấn.' });
   }
 });
