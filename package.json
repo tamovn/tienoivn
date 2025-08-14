@@ -1,12 +1,13 @@
 {
-  "name": "tìm-kiếm-mọi-thứ",
+  "name": "tienoivn-one",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build && cp _headers dist/",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server.js"
   },
   "dependencies": {
     "@google/genai": "^0.14.0"
@@ -16,7 +17,4 @@
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
-}
-"scripts": {
-  "start": "node server.js"
 }
