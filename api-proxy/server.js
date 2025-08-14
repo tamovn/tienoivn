@@ -89,3 +89,7 @@ app.post('/api/generate-advice', async (req, res) => {
 app.listen(port, () => {
   console.log(`✅ Proxy server đang lắng nghe tại http://localhost:${port}`);
 });
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server chạy tại port ${PORT}`);
+});

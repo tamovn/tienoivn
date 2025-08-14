@@ -17,3 +17,6 @@
     "vite": "^6.2.0"
   }
 }
+"scripts": {
+  "start": "node server.js"
+}
