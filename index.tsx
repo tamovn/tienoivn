@@ -1,9 +1,9 @@
 
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import { GoogleGenAI, Type } from "@google/genai";
 import { getProducts, getArticles, getComments, Product, Article, Comment } from './api.js';
 
 
@@ -30,6 +30,7 @@ const RECENTLY_VIEWED_KEY = 'thegioixedien_recently_viewed';
 const MAX_RECENTLY_VIEWED = 5;
 const PRODUCT_CLICKS_KEY = 'thegioixedien_product_clicks';
 const MANAGED_PRODUCTS_KEY = 'thegioixedien_managed_products';
+const API_PROXY_URL = 'http://localhost:3000/api/generate-advice';
 
 let currentModalProduct: Product | null = null;
 const DEFAULT_PAGE_TITLE = "Tienoi.one - Khám phá Sản phẩm & Dịch vụ";
@@ -857,60 +858,48 @@ function displayBlogPosts(articles: Article[]) {
 
 // --- Search Logic ---
 /**
- * Generates expert advice for a given product using the Gemini API.
+ * Generates expert advice for a given product by calling the backend proxy.
  * This function is self-contained and handles its own errors gracefully.
  * @param product The product to analyze.
  * @returns A string containing the formatted HTML advice or an error message.
  */
 async function generateExpertAdvice(product: Product): Promise<string> {
     try {
-        // Initialize AI client just-in-time to prevent app crash if API_KEY is missing.
-        const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
-
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: `Act as an impartial expert product consultant. Based on the following product information, provide a concise analysis in Vietnamese for a potential customer.
-            Product Name: ${product.name}
-            Product Price: ${product.price}
-            Product Description: ${product.description_detail || product.description}
-
-            Your analysis should highlight key advantages, points to consider (including an evaluation of the price in relation to the described features and benefits), and a final summary about its overall value.
-            `,
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        advantages: {
-                            type: Type.ARRAY,
-                            description: 'Key advantages of the product, in Vietnamese.',
-                            items: { type: Type.STRING }
-                        },
-                        considerations: {
-                            type: Type.ARRAY,
-                            description: 'Points for the customer to consider, or potential drawbacks, in Vietnamese. This should include a comment on the price vs. value.',
-                            items: { type: Type.STRING }
-                        },
-                        summary: {
-                            type: Type.STRING,
-                            description: 'A final summary and recommendation about the product\'s overall value, in Vietnamese.'
-                        }
-                    },
-                    required: ['advantages', 'considerations', 'summary']
-                },
+        const response = await fetch(API_PROXY_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ product: product }),
         });
 
-        const jsonStr = response.text.trim();
-        const advice: ExpertAdvice = JSON.parse(jsonStr);
+        if (!response.ok) {
+            let serverErrorMessage;
+            // The server might return a JSON error object, or it might return an HTML error page.
+            // We try to parse it as JSON first.
+            try {
+                const errorData = await response.json();
+                serverErrorMessage = errorData.error;
+            } catch (e) {
+                // If parsing fails, it's not a JSON response. We can log this for debugging.
+                console.error("Could not parse error response as JSON. The server may be down or returning HTML.", await response.text());
+            }
+            // Throw an error with the server message if available, otherwise use the status text.
+            throw new Error(serverErrorMessage || `Lỗi từ máy chủ: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        // The backend returns the advice as a stringified JSON, so we need to parse it.
+        const advice: ExpertAdvice = JSON.parse(data.advice);
 
         return formatAdviceToHtml(advice);
 
     } catch (error) {
-        console.error("Gemini API call for advice failed:", error);
-        // This catch block handles both API key errors and other API failures,
+        console.error("Lỗi khi gọi API proxy để lấy tư vấn:", error);
+        // This catch block handles both network errors and errors from the server,
         // returning a user-facing error message directly.
-        return `<p class="initial-message">Rất tiếc, tính năng tư vấn chuyên gia đang tạm thời gián đoạn. Vui lòng thử lại sau.</p>`;
+        return `<p class="initial-message">Rất tiếc, tính năng tư vấn chuyên gia đang tạm thời gián đoạn. Vui lòng thử lại sau. (Hãy chắc chắn rằng máy chủ proxy đang chạy!)</p>`;
     }
 }
 
