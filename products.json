@@ -1,0 +1,58 @@
+
+[
+  {
+    "name": "Xe Đạp Điện Theli Aima",
+    "description": "Thiết kế thời trang, động cơ mạnh mẽ, phù hợp cho việc đi lại trong thành phố.",
+    "price": "15.500.000đ",
+    "link": "https://example.com/theli-aima",
+    "image": "https://i.ibb.co/L5Bwz8M/e-bike-1.jpg",
+    "type": "Xe đạp điện",
+    "status": "Còn hàng",
+    "description_detail": "Xe Đạp Điện Theli Aima là sự kết hợp hoàn hảo giữa phong cách và hiệu suất. Với pin Lithium dung lượng cao, xe có thể đi được quãng đường lên đến 70km mỗi lần sạc. Động cơ 350W mạnh mẽ giúp bạn dễ dàng vượt qua các con dốc. Hệ thống phanh đĩa an toàn, đèn LED siêu sáng.",
+    "button_text": "Xem ngay"
+  },
+  {
+    "name": "Xe Máy Điện Vinfast Evo200",
+    "description": "Quãng đường di chuyển vượt trội, công nghệ pin LFP tiên tiến, chống nước IP67.",
+    "price": "22.000.000đ",
+    "link": "https://example.com/vinfast-evo200",
+    "image": "https://i.ibb.co/h9yVzZk/e-scooter-1.jpg",
+    "type": "Xe máy điện",
+    "status": "Còn hàng",
+    "description_detail": "Vinfast Evo200 thiết lập tiêu chuẩn mới cho xe máy điện với khả năng di chuyển lên tới 200km sau một lần sạc đầy. Động cơ in-hub và công nghệ pin LFP đảm bảo độ bền và an toàn. Xe có khả năng chống nước chuẩn IP67, yên tâm di chuyển trong mọi điều kiện thời tiết.",
+    "button_text": "Khám phá"
+  },
+  {
+    "name": "Xe Đạp Gấp G-Force C14",
+    "description": "Gọn nhẹ, dễ dàng gấp gọn trong 3 bước, phù hợp cho người hay di chuyển.",
+    "price": "8.900.000đ",
+    "link": "https://example.com/g-force-c14",
+    "image": "https://i.ibb.co/D9pXG2N/folding-bike-1.jpg",
+    "type": "Xe đạp gấp",
+    "status": "Đặt trước",
+    "description_detail": "G-Force C14 là giải pháp di chuyển linh hoạt cho đô thị. Với khung hợp kim nhôm siêu nhẹ, chiếc xe có thể được gấp gọn nhanh chóng để mang lên xe bus, tàu điện hoặc cất trong cốp ô tô. Dù nhỏ gọn, xe vẫn được trang bị bộ đề 7 tốc độ và phanh đĩa an toàn.",
+    "button_text": "Đặt hàng"
+  },
+  {
+    "name": "Pin Lithium 48V-20Ah",
+    "description": "Pin thay thế cao cấp cho xe điện, tăng quãng đường, tuổi thọ cao.",
+    "price": "4.200.000đ",
+    "link": "https://example.com/pin-lithium",
+    "image": "https://i.ibb.co/qYn0S2G/battery-1.jpg",
+    "type": "Linh kiện",
+    "status": "Còn hàng",
+    "description_detail": "Nâng cấp cho xe điện của bạn với pin Lithium 48V-20Ah. Pin sử dụng cell chất lượng cao, cho dòng xả ổn định và tuổi thọ lên đến 5 năm. Vỏ nhôm chống va đập, tích hợp mạch quản lý pin (BMS) thông minh để bảo vệ chống sạc quá mức, xả quá sâu và ngắn mạch.",
+    "button_text": "Xem chi tiết"
+  },
+    {
+    "name": "Xe Máy Điện Yadea G5",
+    "description": "Thiết kế tối giản đậm chất châu Âu, động cơ GTR 2.0 độc quyền.",
+    "price": "39.990.000đ",
+    "link": "https://example.com/yadea-g5",
+    "image": "https://i.ibb.co/wJ2cR6J/e-scooter-2.jpg",
+    "type": "Xe máy điện",
+    "status": "Hết hàng",
+    "description_detail": "Yadea G5 mang vẻ đẹp hiện đại, tinh tế. Xe được trang bị màn hình LCD 7 inch, hệ thống khóa thông minh và động cơ GTR 2.0 mạnh mẽ, tiết kiệm năng lượng. Khung xe bằng thép cán lạnh cao cấp, đảm bảo độ vững chắc và an toàn tối đa.",
+    "button_text": "Xem chi tiết"
+  }
+]
