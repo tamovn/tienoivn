@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
-import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config();
 
@@ -17,7 +17,8 @@ if (!process.env.API_KEY) {
   process.exit(1);
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Khởi tạo Gemini
+const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
 // Endpoint tư vấn sản phẩm
 app.post('/api/generate-advice', async (req, res) => {
@@ -27,29 +28,31 @@ app.post('/api/generate-advice', async (req, res) => {
       return res.status(400).json({ error: 'Thiếu dữ liệu sản phẩm' });
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Act as an impartial expert product consultant. Provide advice about: ${product}`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            advantages: { type: Type.ARRAY, items: { type: Type.STRING } },
-            considerations: { type: Type.ARRAY, items: { type: Type.STRING } },
-            summary: { type: Type.STRING }
-          },
-          required: ['advantages', 'considerations', 'summary']
-        },
-      },
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const output =
-      response.output_text ||
-      response.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "";
+    const prompt = `
+      Act as an impartial expert product consultant.
+      Provide advice about the following product: "${product}".
+      Your response should include:
+      - A list of advantages
+      - A list of considerations or potential drawbacks
+      - A short summary
+      Format your response as JSON with keys: advantages, considerations, summary.
+    `;
 
-    res.json({ advice: output });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
+    // Cố gắng parse JSON từ phản hồi
+    let advice;
+    try {
+      advice = JSON.parse(text);
+    } catch (err) {
+      console.warn("⚠️ Không thể parse JSON từ phản hồi Gemini. Trả về dạng text.");
+      advice = { raw: text };
+    }
+
+    res.json({ advice });
 
   } catch (error) {
     console.error("❌ Lỗi khi gọi Gemini API:", error);
