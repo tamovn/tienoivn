@@ -1,9 +1,3 @@
-
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 // --- Type Interfaces ---
 export interface Product {
   name: string;
@@ -34,16 +28,14 @@ export interface Comment {
 
 // --- Environment and Fetch Configuration ---
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+const baseURL = isProduction
+  ? window.location.origin // dùng domain hiện tại khi production
+  : 'http://localhost:5173'; // hoặc cổng dev của Vite
+
 const FETCH_RETRIES = 3;
 const RETRY_DELAY = 500; // ms
 
 // --- Data Validation ---
-
-/**
- * Validates a single Product object.
- * @param item The object to validate.
- * @returns True if the object is a valid Product, false otherwise.
- */
 function isValidProduct(item: any): item is Product {
   const isValid = 
     item &&
@@ -59,11 +51,6 @@ function isValidProduct(item: any): item is Product {
   return isValid;
 }
 
-/**
- * Validates a single Article object.
- * @param item The object to validate.
- * @returns True if the object is a valid Article, false otherwise.
- */
 function isValidArticle(item: any): item is Article {
   const isValid =
     item &&
@@ -77,11 +64,6 @@ function isValidArticle(item: any): item is Article {
   return isValid;
 }
 
-/**
- * Validates a single Comment object.
- * @param item The object to validate.
- * @returns True if the object is a valid Comment, false otherwise.
- */
 function isValidComment(item: any): item is Comment {
   const isValid = 
     item &&
@@ -94,20 +76,15 @@ function isValidComment(item: any): item is Comment {
   return isValid;
 }
 
-
-/**
- * Fetches, validates, and caches data from a given JSON file with retry logic.
- * @param url The URL of the JSON file.
- * @param validator A function to validate each item in the fetched array.
- * @returns A promise resolving with the validated data.
- */
+// --- Fetch Logic ---
 async function fetchData<T>(url: string, validator: (item: any) => item is T): Promise<T[]> {
+  const fullURL = `${baseURL}${url}`;
   const cacheOption: RequestCache = isProduction ? 'force-cache' : 'no-cache';
-  console.log(`[API] Fetching from: ${url} (Production: ${isProduction}, Cache: ${cacheOption})`);
+  console.log(`[API] Fetching from: ${fullURL} (Production: ${isProduction}, Cache: ${cacheOption})`);
   
   for (let i = 0; i < FETCH_RETRIES; i++) {
     try {
-      const response = await fetch(url, { cache: cacheOption });
+      const response = await fetch(fullURL, { cache: cacheOption });
       
       if (!response.ok) {
         throw new Error(`Network response was not ok. Status: ${response.status}`);
@@ -129,33 +106,22 @@ async function fetchData<T>(url: string, validator: (item: any) => item is T): P
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)));
       } else {
         console.error(`[API] ❌ All retry attempts failed for ${url}. Returning empty array.`);
-        return []; // Return empty array after all retries fail.
+        return [];
       }
     }
   }
-  return []; // Should be unreachable, but here for type safety.
+  return [];
 }
 
-/**
- * Fetches all products from the products.json file.
- * @returns A promise that resolves to an array of valid Product objects.
- */
+// --- Public API ---
 export const getProducts = (): Promise<Product[]> => {
-    return fetchData<Product>('/products.json', isValidProduct);
+  return fetchData<Product>('/products.json', isValidProduct);
 }
 
-/**
- * Fetches all articles from the blog.json file.
- * @returns A promise that resolves to an array of valid Article objects.
- */
 export const getArticles = (): Promise<Article[]> => {
-    return fetchData<Article>('/blog.json', isValidArticle);
+  return fetchData<Article>('/blog.json', isValidArticle);
 }
 
-/**
- * Fetches all comments from the comments.json file.
- * @returns A promise that resolves to an array of valid Comment objects.
- */
 export const getComments = (): Promise<Comment[]> => {
-    return fetchData<Comment>('/comments.json', isValidComment);
+  return fetchData<Comment>('/comments.json', isValidComment);
 }

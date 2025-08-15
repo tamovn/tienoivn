@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="vi">
   <head>
@@ -12,13 +13,14 @@
     <script type="importmap">
       {
         "imports": {
-          "@google/genai": "https://esm.sh/@google/genai@^0.14.0"
+          "@google/genai": "https://esm.sh/@google/genai@^0.14.0",
+          "./api.js": "./api.ts"
         }
       }
     </script>
-  <script type="module" crossorigin src="/assets/index-U76OHQWC.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-DI5Yluhe.css">
-</head>
+    <script type="module" crossorigin src="/assets/index-C68AUc-k.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DI5Yluhe.css">
+  </head>
   <body>
     <header id="home">
         <canvas id="particle-canvas"></canvas>
@@ -50,8 +52,6 @@
     </header>
 
     <main>
-        <div id="loading-spinner" style="display: none;"></div>
-
         <section id="search-section">
             <div class="search-section-wrapper">
                 <h2>Bắt Đầu Khám Phá</h2>
@@ -81,7 +81,7 @@
         </section>
 
         <section id="results" class="product-grid" aria-live="polite">
-            <!-- Products will be loaded here by JavaScript -->
+            <!-- Products or skeletons will be loaded here by JavaScript -->
         </section>
       
         <section id="recently-viewed-section" class="recently-viewed" style="display: none;">
@@ -119,8 +119,7 @@
         <section id="blog" class="content-section">
             <h2>Blog</h2>
             <div id="blog-grid" class="article-grid">
-                <!-- Blog posts will be loaded here by JavaScript -->
-                <div id="loading-spinner-blog" class="loading-spinner"></div>
+                <!-- Blog posts or skeletons will be loaded here by JavaScript -->
             </div>
         </section>
 
@@ -278,6 +277,21 @@
             <!-- Admin product list will be injected here -->
         </div>
     </section>
+    
+    <!-- Article Detail Page -->
+    <section id="article-detail-page" class="policy-page" style="display: none;">
+        <div class="article-detail-header">
+            <a href="#blog" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/></svg>
+                <span>Quay lại Blog</span>
+            </a>
+        </div>
+        <h1 id="article-detail-title"></h1>
+        <img id="article-detail-image" src="" alt="" class="article-detail-image">
+        <div id="article-detail-content" class="article-detail-body">
+            <!-- Article content will be injected here -->
+        </div>
+    </section>
 
     <!-- Admin Form Modal -->
     <div id="admin-form-modal" class="modal-overlay">
@@ -409,5 +423,5 @@
         </div>
       </div>
     </div>
-</body>
+  </body>
 </html>
