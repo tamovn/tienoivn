@@ -28,9 +28,8 @@ export interface Comment {
 
 // --- Environment and Fetch Configuration ---
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-const baseURL = isProduction
-  ? window.location.origin // dùng domain hiện tại khi production
-  : 'http://localhost:5173'; // hoặc cổng dev của Vite
+const baseURL = import.meta.env.VITE_API_URL || window.location.origin;
+
 
 const FETCH_RETRIES = 3;
 const RETRY_DELAY = 500; // ms
