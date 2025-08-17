@@ -865,7 +865,7 @@ function displayBlogPosts(articles: Article[]) {
  */
 async function generateExpertAdvice(product: Product): Promise<string> {
     try {
-        const response = await fetch(API_PROXY_URL, {
+        const response = await fetch(API_PROXY_URL + "/api/generate", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
