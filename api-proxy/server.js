@@ -20,7 +20,12 @@ app.post('/api/generate', async (req, res) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     // ✅ Tạo prompt từ JSON (tùy biến theo mục đích của bạn)
     const customPromt = `
-      trở thành 1 chuyên gia tư vấn, dựa vào tên sản phẩm, mô tả ngắn, mô tả chi tiết hãy đánh giá sản phẩm này có thực sự phù hợp với nhau cầu của khách hàng hay không, và khuyến khích họ mua sản phẩm:
+      trở thành 1 chuyên gia tư vấn, dựa vào tên sản phẩm, mô tả ngắn, mô tả chi tiết hãy đánh giá sản phẩm này có thực sự phù hợp với nhau cầu của khách hàng hay không, và khuyến khích họ mua sản phẩm
+    sau đó trả kết quả thành 3 phần theo interface ExpertAdvice {
+    advantages: string[];
+    considerations: string[];
+    summary: string;
+    }:
 
       Tên sản phẩm: ${data.name}
       Mô tả ngắn: ${data.description}

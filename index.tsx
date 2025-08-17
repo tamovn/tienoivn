@@ -890,13 +890,8 @@ async function generateExpertAdvice(product: Product): Promise<string> {
 
         const data = await response.json();
         
-        const advice: ExpertAdvice = {
-        advantages: [],
-        considerations: [],
-        summary: data // lấy thẳng string
-        };
-
-
+        // The backend returns the advice as a stringified JSON, so we need to parse it.
+        const advice: ExpertAdvice = JSON.parse(data.advice);
 
         return formatAdviceToHtml(advice);
 
