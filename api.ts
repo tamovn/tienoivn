@@ -4,9 +4,9 @@
  */
 
 // Import data directly from JSON files
-import productsData from './public/products.json';
-import blogData from './public/blog.json';
-import commentsData from './public/comments.json';
+import productsData from './products.json';
+import articlesData from './articles.json';
+import commentsData from './comments.json';
 
 // --- Type Interfaces ---
 export interface Product {
@@ -21,15 +21,18 @@ export interface Product {
   button_text: string;
 }
 
-export interface blog {
+export interface Article {
   title: string;
   description: string;
+  link: string;
   imageURL: string;
-  slug: string;
-  content:  string;
 }
 
-export interface Comments {
+export interface Comment {
+  product_type: string;
+  author: string;
+  text: string;
+  date: string;
 }
 
 // --- Data Validation ---
@@ -59,7 +62,7 @@ function isValidProduct(item: any): item is Product {
  * @param item The object to validate.
  * @returns True if the object is a valid Article, false otherwise.
  */
-function isValidArticle(item: any): item is blog {
+function isValidArticle(item: any): item is Article {
   const isValid =
     item &&
     typeof item.title === 'string' && item.title.trim() !== '' &&
@@ -111,13 +114,13 @@ export const getProducts = async (): Promise<Product[]> => {
  * Gets all articles directly from the imported JSON module.
  * @returns A promise that resolves to an array of valid Article objects.
  */
-export const getblog = async (): Promise<blog[]> => {
+export const getArticles = async (): Promise<Article[]> => {
     try {
-        if (!Array.isArray(blogData)) {
+        if (!Array.isArray(articlesData)) {
           throw new Error('Imported article data is not an array.');
         }
-        const validatedData = blogData.filter(isValidArticle);
-        console.log(`[API] ✅ Loaded articles.json. Imported: ${blogData.length}, Validated: ${validatedData.length}`);
+        const validatedData = articlesData.filter(isValidArticle);
+        console.log(`[API] ✅ Loaded articles.json. Imported: ${articlesData.length}, Validated: ${validatedData.length}`);
         return validatedData;
     } catch (error) {
         console.error('[API] ❌ Failed to load articles:', error);
@@ -129,7 +132,7 @@ export const getblog = async (): Promise<blog[]> => {
  * Gets all comments directly from the imported JSON module.
  * @returns A promise that resolves to an array of valid Comment objects.
  */
-export const getComments = async (): Promise<Comments[]> => {
+export const getComments = async (): Promise<Comment[]> => {
     try {
         if (!Array.isArray(commentsData)) {
           throw new Error('Imported comment data is not an array.');
