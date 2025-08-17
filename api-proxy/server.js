@@ -21,7 +21,7 @@ app.post('/api/generate', async (req, res) => {
     // ✅ Tạo prompt từ JSON (tùy biến theo mục đích của bạn)
     const customPromt = `
       trở thành 1 chuyên gia tư vấn, dựa vào tên sản phẩm, mô tả ngắn, mô tả chi tiết hãy đánh giá sản phẩm này có thực sự phù hợp với nhau cầu của khách hàng hay không, và khuyến khích họ mua sản phẩm
-    sau đó trả kết quả text json duy nhất có cấu trúc 3 phần như sau interface ExpertAdvice {
+    sau đó trả kết quả text dạng json duy nhất có cấu trúc 3 phần như sau interface ExpertAdvice {
     advantages: string[];
     considerations: string[];
     summary: string;
