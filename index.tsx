@@ -30,7 +30,7 @@ const RECENTLY_VIEWED_KEY = 'thegioixedien_recently_viewed';
 const MAX_RECENTLY_VIEWED = 5;
 const PRODUCT_CLICKS_KEY = 'thegioixedien_product_clicks';
 const MANAGED_PRODUCTS_KEY = 'thegioixedien_managed_products';
-const API_PROXY_URL = 'http://localhost:3000/api/generate-advice';
+const API_PROXY_URL = 'https://api.tienoivn.one';
 
 let currentModalProduct: Product | null = null;
 const DEFAULT_PAGE_TITLE = "Tienoi.one - Khám phá Sản phẩm & Dịch vụ";
