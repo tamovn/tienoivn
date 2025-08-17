@@ -5,7 +5,7 @@
 
 // Import data directly from JSON files
 import productsData from './public/products.json';
-import articlesData from './public/articles.json';
+import articlesData from './public/blog.json';
 import commentsData from './public/comments.json';
 
 // --- Type Interfaces ---
