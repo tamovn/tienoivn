@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "description": "A secure API proxy for the Tienoi.one frontend to call the Gemini API.",
   "main": "server.js",
+  "type": "module",
+
   "scripts": {
     "start": "node api-proxy/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
