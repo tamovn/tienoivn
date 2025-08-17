@@ -24,15 +24,12 @@ export interface Product {
 export interface blog {
   title: string;
   description: string;
-  link: string;
   imageURL: string;
+  slug: string;
+  content:  string;
 }
 
-export interface Comment {
-  product_type: string;
-  author: string;
-  text: string;
-  date: string;
+export interface Comments {
 }
 
 // --- Data Validation ---
@@ -62,7 +59,7 @@ function isValidProduct(item: any): item is Product {
  * @param item The object to validate.
  * @returns True if the object is a valid Article, false otherwise.
  */
-function isValidArticle(item: any): item is Article {
+function isValidArticle(item: any): item is blog {
   const isValid =
     item &&
     typeof item.title === 'string' && item.title.trim() !== '' &&
@@ -132,7 +129,7 @@ export const getblog = async (): Promise<blog[]> => {
  * Gets all comments directly from the imported JSON module.
  * @returns A promise that resolves to an array of valid Comment objects.
  */
-export const getComments = async (): Promise<Comment[]> => {
+export const getComments = async (): Promise<Comments[]> => {
     try {
         if (!Array.isArray(commentsData)) {
           throw new Error('Imported comment data is not an array.');
