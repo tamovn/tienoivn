@@ -893,7 +893,7 @@ async function generateExpertAdvice(product: Product): Promise<string> {
         const advice: ExpertAdvice = {
         advantages: [],
         considerations: [],
-        summary: data.output // lấy thẳng string
+        summary: data // lấy thẳng string
         };
 
 
