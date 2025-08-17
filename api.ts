@@ -21,7 +21,7 @@ export interface Product {
   button_text: string;
 }
 
-export interface Article {
+export interface blog {
   title: string;
   description: string;
   link: string;
@@ -114,13 +114,13 @@ export const getProducts = async (): Promise<Product[]> => {
  * Gets all articles directly from the imported JSON module.
  * @returns A promise that resolves to an array of valid Article objects.
  */
-export const getArticles = async (): Promise<Article[]> => {
+export const getblog = async (): Promise<blog[]> => {
     try {
-        if (!Array.isArray(articlesData)) {
+        if (!Array.isArray(blogData)) {
           throw new Error('Imported article data is not an array.');
         }
-        const validatedData = articlesData.filter(isValidArticle);
-        console.log(`[API] ✅ Loaded articles.json. Imported: ${articlesData.length}, Validated: ${validatedData.length}`);
+        const validatedData = blogData.filter(isValidArticle);
+        console.log(`[API] ✅ Loaded articles.json. Imported: ${blogData.length}, Validated: ${validatedData.length}`);
         return validatedData;
     } catch (error) {
         console.error('[API] ❌ Failed to load articles:', error);
