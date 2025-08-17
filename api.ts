@@ -4,9 +4,9 @@
  */
 
 // Import data directly from JSON files
-import productsData from './products.json';
-import articlesData from './articles.json';
-import commentsData from './comments.json';
+import productsData from './public/products.json';
+import articlesData from './public/blog.json';
+import commentsData from './public/comments.json';
 
 // --- Type Interfaces ---
 export interface Product {
@@ -24,8 +24,9 @@ export interface Product {
 export interface Article {
   title: string;
   description: string;
-  link: string;
+  slug: string;
   imageURL: string;
+  content: string;
 }
 
 export interface Comment {
