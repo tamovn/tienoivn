@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// Import data directly from JSON files
+import productsData from './public/products.json';
+import articlesData from './public/articles.json';
+import commentsData from './public/comments.json';
+
 // --- Type Interfaces ---
 export interface Product {
   name: string;
@@ -29,11 +34,6 @@ export interface Comment {
   text: string;
   date: string;
 }
-
-// --- Environment and Fetch Configuration ---
-const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-const cacheOption: RequestCache = isProduction ? 'force-cache' : 'no-cache';
-
 
 // --- Data Validation ---
 
@@ -93,70 +93,55 @@ function isValidComment(item: any): item is Comment {
 
 
 /**
- * Fetches all products from the products.json file.
+ * Gets all products directly from the imported JSON module.
  * @returns A promise that resolves to an array of valid Product objects.
  */
 export const getProducts = async (): Promise<Product[]> => {
   try {
-    const response = await fetch('public/products.json', { cache: cacheOption });
-    if (!response.ok) {
-      throw new Error(`Network response was not ok for products.json. Status: ${response.status}`);
+    if (!Array.isArray(productsData)) {
+      throw new Error('Imported product data is not an array.');
     }
-    const rawData = await response.json();
-    if (!Array.isArray(rawData)) {
-      throw new Error('Fetched product data is not an array.');
-    }
-    const validatedData = rawData.filter(isValidProduct);
-    console.log(`[API] ✅ Success for products.json. Fetched: ${rawData.length}, Validated: ${validatedData.length}`);
+    const validatedData = productsData.filter(isValidProduct);
+    console.log(`[API] ✅ Loaded products.json. Imported: ${productsData.length}, Validated: ${validatedData.length}`);
     return validatedData;
   } catch (error) {
-    console.error('[API] ❌ Failed to fetch products:', error);
+    console.error('[API] ❌ Failed to load products:', error);
     return []; // Return empty array on failure
   }
 };
 
 /**
- * Fetches all articles from the articles.json file.
+ * Gets all articles directly from the imported JSON module.
  * @returns A promise that resolves to an array of valid Article objects.
  */
 export const getArticles = async (): Promise<Article[]> => {
     try {
-        const response = await fetch('/articles.json', { cache: cacheOption });
-        if (!response.ok) {
-          throw new Error(`Network response was not ok for articles.json. Status: ${response.status}`);
+        if (!Array.isArray(articlesData)) {
+          throw new Error('Imported article data is not an array.');
         }
-        const rawData = await response.json();
-        if (!Array.isArray(rawData)) {
-          throw new Error('Fetched article data is not an array.');
-        }
-        const validatedData = rawData.filter(isValidArticle);
-        console.log(`[API] ✅ Success for articles.json. Fetched: ${rawData.length}, Validated: ${validatedData.length}`);
+        const validatedData = articlesData.filter(isValidArticle);
+        console.log(`[API] ✅ Loaded articles.json. Imported: ${articlesData.length}, Validated: ${validatedData.length}`);
         return validatedData;
     } catch (error) {
-        console.error('[API] ❌ Failed to fetch articles:', error);
+        console.error('[API] ❌ Failed to load articles:', error);
         return [];
     }
 };
 
 /**
- * Fetches all comments from the comments.json file.
+ * Gets all comments directly from the imported JSON module.
  * @returns A promise that resolves to an array of valid Comment objects.
  */
 export const getComments = async (): Promise<Comment[]> => {
     try {
-        const response = await fetch('/comments.json', { cache: cacheOption });
-        if (!response.ok) {
-          throw new Error(`Network response was not ok for comments.json. Status: ${response.status}`);
+        if (!Array.isArray(commentsData)) {
+          throw new Error('Imported comment data is not an array.');
         }
-        const rawData = await response.json();
-        if (!Array.isArray(rawData)) {
-          throw new Error('Fetched comment data is not an array.');
-        }
-        const validatedData = rawData.filter(isValidComment);
-        console.log(`[API] ✅ Success for comments.json. Fetched: ${rawData.length}, Validated: ${validatedData.length}`);
+        const validatedData = commentsData.filter(isValidComment);
+        console.log(`[API] ✅ Loaded comments.json. Imported: ${commentsData.length}, Validated: ${validatedData.length}`);
         return validatedData;
     } catch (error) {
-        console.error('[API] ❌ Failed to fetch comments:', error);
+        console.error('[API] ❌ Failed to load comments:', error);
         return [];
     }
 };
