@@ -130,10 +130,10 @@ async function fetchData<T>(
 
 // --- Public API ---
 export const getProducts = (): Promise<Product[]> =>
-  fetchData<Product>('/products.json', isValidProduct);
+  fetchData<Product>('/public/products.json', isValidProduct);
 
 export const getArticles = (): Promise<Article[]> =>
-  fetchData<Article>('/blog.json', isValidArticle);
+  fetchData<Article>('/public/blog.json', isValidArticle);
 
 export const getComments = (): Promise<Comment[]> =>
-  fetchData<Comment>('/comments.json', isValidComment);
+  fetchData<Comment>('/public/comments.json', isValidComment);
