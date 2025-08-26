@@ -887,12 +887,8 @@ async function generateExpertAdvice(product: Product): Promise<string> {
             // Throw an error with the server message if available, otherwise use the status text.
             throw new Error(serverErrorMessage || `Lỗi từ máy chủ: ${response.status} ${response.statusText}`);
         }
-
-        const data = await response.json();
-        
         // The backend returns the advice as a stringified JSON, so we need to parse it.
-        const advice: ExpertAdvice = JSON.parse(data);
-
+        const advice: ExpertAdvice = await response.json();
         return formatAdviceToHtml(advice);
 
     } catch (error) {
